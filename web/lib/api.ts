@@ -95,7 +95,7 @@ export interface VMAction {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ||
   (typeof window !== 'undefined' && window.location.hostname !== 'localhost'
-    ? `http://${window.location.hostname}:5550/api`
+    ? `${window.location.protocol}//${window.location.host}/api`
     : "http://localhost:5550/api")
 
 let apiKey: string | null = null
@@ -298,7 +298,7 @@ export const networkAPI = {
   getInterfaces: (): Promise<NetworkInterface[]> => apiRequest("/interfaces"),
   getSystemInterfaces: (): Promise<SystemInterface[]> => apiRequest("/system-interfaces"),
   getVMConnections: (): Promise<VMNetworkConnection[]> => apiRequest("/vm-connections"),
-  createNetwork: (name: string, bridgeName: string): Promise<void> => 
+  createNetwork: (name: string, bridgeName: string): Promise<void> =>
     apiRequest("/networks", {
       method: "POST",
       body: JSON.stringify({ name, bridgeName }),
