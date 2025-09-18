@@ -1,10 +1,17 @@
 package libvirtclient
 
+/*
+#cgo pkg-config: libvirt
+#include <libvirt/libvirt.h>
+*/
+import "C"
 import (
 	"fmt"
 	"github.com/ccheshirecat/flint/pkg/core"
 	libvirt "github.com/libvirt/libvirt-go"
+	"os"
 	"reflect"
+	"strconv"
 	"strings"
 	"syscall"
 )
@@ -150,14 +157,41 @@ func (c *Client) GetHostResources() (core.HostResources, error) {
 
 	out.CPUCores = int(nodeInfo.Cpus)
 	out.TotalMemoryKB = nodeInfo.Memory // This is in KiB
-
-	// Try to get free memory
-	freeMem, err := c.conn.GetFreeMemory()
+	// Use /proc/meminfo for a more reliable memory reading
+	memInfo, err := c.getMemInfo()
 	if err == nil {
-		out.FreeMemoryKB = freeMem / 1024 // Convert bytes to KiB
+		if total, ok := memInfo["MemTotal"]; ok {
+			out.TotalMemoryKB = total
+		} else {
+			// Fallback to libvirt if MemTotal is somehow not in /proc/meminfo
+			out.TotalMemoryKB = nodeInfo.Memory
+		}
+
+		// Prefer "MemAvailable" for a more accurate representation of available memory
+		if available, ok := memInfo["MemAvailable"]; ok {
+			out.FreeMemoryKB = available
+		} else {
+			// Fallback for older kernels: MemFree + Buffers + Cached
+			memFree, _ := memInfo["MemFree"]
+			buffers, _ := memInfo["Buffers"]
+			cached, _ := memInfo["Cached"]
+			out.FreeMemoryKB = memFree + buffers + cached
+		}
 	} else {
-		// Fallback: estimate free memory as a percentage
-		out.FreeMemoryKB = out.TotalMemoryKB / 10 // Conservative estimate
+		// Fallback to libvirt's methods if reading /proc/meminfo fails entirely
+		memoryStats, err := c.conn.GetMemoryStats(C.VIR_NODE_MEMORY_STATS_ALL_CELLS, 0)
+		if err == nil {
+			out.FreeMemoryKB = memoryStats.Free
+			if memoryStats.BuffersSet {
+				out.FreeMemoryKB += memoryStats.Buffers
+			}
+			if memoryStats.CachedSet {
+				out.FreeMemoryKB += memoryStats.Cached
+			}
+		} else {
+			// Fallback: estimate free memory as a percentage
+			out.FreeMemoryKB = out.TotalMemoryKB / 10 // Conservative estimate
+		}
 	}
 
 	// Storage pools: deduplicate by filesystem to avoid double-counting
@@ -244,4 +278,35 @@ func (c *Client) GetHostResources() (core.HostResources, error) {
 	}
 
 	return out, nil
+}
+
+// getMemInfo reads /proc/meminfo and returns a map of key-value pairs.
+// Values are in kB as reported by /proc/meminfo.
+func (c *Client) getMemInfo() (map[string]uint64, error) {
+	content, err := os.ReadFile("/proc/meminfo")
+	if err != nil {
+		return nil, fmt.Errorf("could not read /proc/meminfo: %w", err)
+	}
+
+	memInfo := make(map[string]uint64)
+	lines := strings.Split(string(content), "\n")
+
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) < 2 {
+			continue
+		}
+
+		key := strings.TrimRight(parts[0], ":")
+		value, err := strconv.ParseUint(parts[1], 10, 64)
+		if err != nil {
+			// Skip lines where the value is not a number
+			continue
+		}
+
+		// The values in /proc/meminfo are in kB (or KiB), so they are already in the correct unit
+		memInfo[key] = value
+	}
+
+	return memInfo, nil
 }
