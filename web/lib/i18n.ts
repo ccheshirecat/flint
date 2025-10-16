@@ -4,7 +4,7 @@ import zh from '../public/locales/zh/common.json'
 export const locales = ['en', 'zh'] as const
 export type Locale = typeof locales[number]
 
-export const defaultLocale: Locale = 'zh'
+export const defaultLocale: Locale = 'en'
 
 const translations = {
   en,

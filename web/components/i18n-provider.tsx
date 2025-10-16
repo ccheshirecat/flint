@@ -18,8 +18,8 @@ export function I18nProvider({
   children: React.ReactNode
   initialLocale?: Locale 
 }) {
-  const [locale, setLocale] = useState<Locale>('zh')
-  const [translations, setTranslations] = useState(getTranslations('zh'))
+  const [locale, setLocale] = useState<Locale>(defaultLocale)
+  const [translations, setTranslations] = useState(getTranslations(defaultLocale))
   const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
@@ -40,11 +40,11 @@ export function I18nProvider({
         setLocale(savedLocale)
         setTranslations(getTranslations(savedLocale))
       } else {
-        // Set default to Chinese if no saved preference
-        console.log('Setting default locale to Chinese')
-        setLocale('zh')
-        setTranslations(getTranslations('zh'))
-        localStorage.setItem('locale', 'zh')
+        // Set default locale if no saved preference
+        console.log('Setting default locale to', defaultLocale)
+        setLocale(defaultLocale)
+        setTranslations(getTranslations(defaultLocale))
+        localStorage.setItem('locale', defaultLocale)
       }
       setIsInitialized(true)
     }
