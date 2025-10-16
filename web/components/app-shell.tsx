@@ -4,10 +4,12 @@ import type React from "react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { useTranslation } from '@/components/i18n-provider'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
 import { LayoutDashboard, Server, HardDrive, Network, ImageIcon, Settings, Menu, X, Activity } from "lucide-react"
 import { vmAPI, hostAPI, HostResources, HostStatus } from "@/lib/api" // Assume HostStatus is imported here
 
@@ -15,16 +17,17 @@ interface AppShellProps {
   children: React.ReactNode
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Virtual Machines", href: "/vms", icon: Server },
-  { name: "Storage", href: "/storage", icon: HardDrive },
-  { name: "Networking", href: "/networking", icon: Network },
-  { name: "Images & Templates", href: "/images", icon: ImageIcon },
-  { name: "Settings", href: "/settings", icon: Settings },
-]
-
 export function AppShell({ children }: AppShellProps) {
+  const { t } = useTranslation()
+  
+  const navigation = [
+    { name: t('navigation.dashboard'), href: "/", icon: LayoutDashboard },
+    { name: t('navigation.virtualMachines'), href: "/vms", icon: Server },
+    { name: t('navigation.storage'), href: "/storage", icon: HardDrive },
+    { name: t('navigation.networking'), href: "/networking", icon: Network },
+    { name: t('navigation.images'), href: "/images", icon: ImageIcon },
+    { name: t('navigation.settings'), href: "/settings", icon: Settings },
+  ]
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [vmCount, setVmCount] = useState<number | null>(null)
   const [hostStatus, setHostStatus] = useState<HostStatus | null>(null)
@@ -99,7 +102,7 @@ export function AppShell({ children }: AppShellProps) {
             <div className="hidden sm:flex items-center gap-2 animate-fade-scale">
               <Activity className="h-4 w-4 text-primary transition-colors" />
               <span className="text-sm font-medium hidden md:inline">
-                {loading ? "Loading..." : vmCount !== null ? "Connected" : "Disconnected"}
+                {loading ? t('common.loading') : vmCount !== null ? t('common.connected') : t('common.disconnected')}
               </span>
               {!loading && vmCount !== null && (
                 <Badge 
@@ -110,6 +113,7 @@ export function AppShell({ children }: AppShellProps) {
                 </Badge>
               )}
             </div>
+            <LanguageToggle />
             <ThemeToggle />
           </div>
         </div>
@@ -126,7 +130,7 @@ export function AppShell({ children }: AppShellProps) {
           <div className="flex h-full flex-col overflow-hidden">
             {/* Mobile Header Close Button */}
             <div className="flex h-14 sm:h-16 items-center justify-between px-4 lg:hidden border-b border-border/50 bg-sidebar/90">
-              <span className="text-base sm:text-lg font-display font-bold text-sidebar-foreground">Navigation</span>
+              <span className="text-base sm:text-lg font-display font-bold text-sidebar-foreground">{t('navigation.dashboard')}</span>
               <Button
                 variant="ghost"
                 size="sm"
@@ -169,28 +173,28 @@ export function AppShell({ children }: AppShellProps) {
             {/* System Status Card: Layered surfaces, subtle shadows, responsive */}
             <div className="border-t border-border/50 p-4 bg-surface-1">
               <div className="rounded-xl bg-surface-2 p-4 transition-all duration-200 hover:shadow-md hover:bg-surface-3 border border-border/30 animate-fade-in">
-                <h3 className="text-sm font-display font-semibold text-foreground mb-3">System Overview</h3>
+                <h3 className="text-sm font-display font-semibold text-foreground mb-3">{t('common.systemOverview')}</h3>
                 <div className="space-y-2 text-xs text-muted-foreground">
                   <div className="flex justify-between items-center py-1">
-                    <span>CPU Usage</span>
+                    <span>{t('common.cpuUsage')}</span>
                     <span className="font-medium text-foreground">
                       {loading ? "..." : hostResources ? `${Math.round((hostResources.total_memory_kb - hostResources.free_memory_kb) / hostResources.total_memory_kb * 100)}%` : "0%"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span>Memory</span>
+                    <span>{t('common.memory')}</span>
                     <span className="font-medium text-foreground">
                       {loading ? "..." : hostResources ? `${formatMemory(hostResources.total_memory_kb - hostResources.free_memory_kb)}/${formatMemory(hostResources.total_memory_kb)} GB` : "0/0 GB"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span>Storage</span>
+                    <span>{t('common.storage')}</span>
                     <span className="font-medium text-foreground">
                       {loading ? "..." : hostResources ? `${formatStorage(hostResources.storage_used_b)}/${formatStorage(hostResources.storage_total_b)} GB` : "0/0 GB"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span>VMs Running</span>
+                    <span>{t('common.vmsRunning')}</span>
                     <span className="font-medium text-foreground">
                       {loading ? "..." : hostStatus ? `${hostStatus.running_vms}/${hostStatus.total_vms}` : "0/0"}
                     </span>

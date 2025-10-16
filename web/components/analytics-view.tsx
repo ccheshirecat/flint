@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -32,6 +33,7 @@ import {
 } from "lucide-react"
 
 export function AnalyticsView() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("overview")
   const [timeRange, setTimeRange] = useState("24h")
@@ -84,7 +86,7 @@ export function AnalyticsView() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
-                CPU Usage
+                {t('common.cpuUsage')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -95,7 +97,7 @@ export function AnalyticsView() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                Memory Usage
+                {t('analytics.memoryUsage')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -111,17 +113,17 @@ export function AnalyticsView() {
     return (
       <div className="space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
+          <h1 className="text-3xl font-display font-bold text-foreground">{t('analytics.title')}</h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => refreshPage()}>
               <RefreshCw className="mr-2 h-4 w-4" />
-              Refresh
+              {t('analytics.refresh')}
             </Button>
           </div>
         </div>
         <div className={`${SPACING.section} ${SPACING.page}`}>
           <ErrorState 
-            title="Error Loading Analytics"
+            title={t('analytics.errorLoadingAnalytics')}
             description={error}
           />
         </div>
@@ -133,8 +135,8 @@ export function AnalyticsView() {
     <div className={`${SPACING.section} ${TRANSITIONS.slideUp}`}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={TYPOGRAPHY.pageTitle}>Analytics</h1>
-          <p className="text-muted-foreground mt-1">Monitor and analyze your virtualization infrastructure performance</p>
+          <h1 className={TYPOGRAPHY.pageTitle}>{t('analytics.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('analytics.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <ConsistentButton 
@@ -145,7 +147,7 @@ export function AnalyticsView() {
             }}
             icon={<RefreshCw className="h-4 w-4" />}
           >
-            Refresh
+            {t('analytics.refresh')}
           </ConsistentButton>
           <ConsistentButton 
             variant="outline" 
@@ -182,13 +184,13 @@ export function AnalyticsView() {
               URL.revokeObjectURL(url)
               
               toast({
-                title: "Export Complete",
-                description: "Analytics data exported successfully",
+                title: t('analytics.exportComplete'),
+                description: t('analytics.exportSuccess'),
               })
             }}
             icon={<Download className="h-4 w-4" />}
           >
-            Export
+            {t('analytics.export')}
           </ConsistentButton>
         </div>
       </div>
@@ -197,19 +199,19 @@ export function AnalyticsView() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview" className="hover-premium transition-all duration-200">
             <Activity className="mr-2 h-4 w-4" />
-            Overview
+            {t('analytics.overview')}
           </TabsTrigger>
           <TabsTrigger value="cpu" className="hover-premium transition-all duration-200">
             <Activity className="mr-2 h-4 w-4" />
-            CPU
+            {t('analytics.cpu')}
           </TabsTrigger>
           <TabsTrigger value="memory" className="hover-premium transition-all duration-200">
             <TrendingUp className="mr-2 h-4 w-4" />
-            Memory
+            {t('analytics.memory')}
           </TabsTrigger>
           <TabsTrigger value="storage" className="hover-premium transition-all duration-200">
             <HardDrive className="mr-2 h-4 w-4" />
-            Storage
+            {t('analytics.storage')}
           </TabsTrigger>
         </TabsList>
 
@@ -220,7 +222,7 @@ export function AnalyticsView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">CPU Cores</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('analytics.cpuCores')}</p>
                     <p className="text-2xl font-bold">{metrics?.cpu_cores || 0}</p>
                   </div>
                   <Cpu className="h-8 w-8 text-muted-foreground" />
@@ -232,7 +234,7 @@ export function AnalyticsView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Memory Usage</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('analytics.memoryUsage')}</p>
                     <p className="text-2xl font-bold">
                       {metrics ? `${Math.round(((metrics.total_memory_kb - metrics.free_memory_kb) / metrics.total_memory_kb) * 100)}%` : '0%'}
                     </p>
@@ -246,7 +248,7 @@ export function AnalyticsView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Storage Usage</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('analytics.storageUsage')}</p>
                     <p className="text-2xl font-bold">
                       {metrics ? `${Math.round((metrics.storage_used_b / metrics.storage_total_b) * 100)}%` : '0%'}
                     </p>
@@ -260,7 +262,7 @@ export function AnalyticsView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Running VMs</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('analytics.runningVMs')}</p>
                     <p className="text-2xl font-bold">{hostStatus?.running_vms || 0}</p>
                   </div>
                   <Server className="h-8 w-8 text-muted-foreground" />
@@ -274,13 +276,13 @@ export function AnalyticsView() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <MemoryStick className="h-4 w-4" />
-                  Memory Usage
+                  {t('analytics.memoryUsage')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Used Memory</span>
+                    <span>{t('analytics.usedMemory')}</span>
                     <span>{metrics ? `${Math.round((metrics.total_memory_kb - metrics.free_memory_kb) / 1024 / 1024)}GB / ${Math.round(metrics.total_memory_kb / 1024 / 1024)}GB` : 'Loading...'}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
@@ -292,8 +294,8 @@ export function AnalyticsView() {
                     />
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Free: {metrics ? `${Math.round(metrics.free_memory_kb / 1024 / 1024)}GB` : '0GB'}</span>
-                    <span>{metrics ? `${Math.round(((metrics.total_memory_kb - metrics.free_memory_kb) / metrics.total_memory_kb) * 100)}%` : '0%'} used</span>
+                    <span>{t('analytics.free')}: {metrics ? `${Math.round(metrics.free_memory_kb / 1024 / 1024)}GB` : '0GB'}</span>
+                    <span>{metrics ? `${Math.round(((metrics.total_memory_kb - metrics.free_memory_kb) / metrics.total_memory_kb) * 100)}%` : '0%'} {t('analytics.used')}</span>
                   </div>
                 </div>
               </CardContent>
@@ -303,13 +305,13 @@ export function AnalyticsView() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <HardDrive className="h-4 w-4" />
-                  Storage Usage
+                  {t('analytics.storageUsage')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Used Storage</span>
+                    <span>{t('analytics.usedStorage')}</span>
                     <span>{metrics ? `${Math.round(metrics.storage_used_b / 1024 / 1024 / 1024)}GB / ${Math.round(metrics.storage_total_b / 1024 / 1024 / 1024)}GB` : 'Loading...'}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3">
@@ -321,8 +323,8 @@ export function AnalyticsView() {
                     />
                   </div>
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Free: {metrics ? `${Math.round((metrics.storage_total_b - metrics.storage_used_b) / 1024 / 1024 / 1024)}GB` : '0GB'}</span>
-                    <span>{metrics ? `${Math.round((metrics.storage_used_b / metrics.storage_total_b) * 100)}%` : '0%'} used</span>
+                    <span>{t('analytics.free')}: {metrics ? `${Math.round((metrics.storage_total_b - metrics.storage_used_b) / 1024 / 1024 / 1024)}GB` : '0GB'}</span>
+                    <span>{metrics ? `${Math.round((metrics.storage_used_b / metrics.storage_total_b) * 100)}%` : '0%'} {t('analytics.used')}</span>
                   </div>
                 </div>
               </CardContent>

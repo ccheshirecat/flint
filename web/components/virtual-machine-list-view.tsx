@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { navigateTo, routes } from "@/lib/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -32,6 +33,7 @@ import { ConsistentButton } from "@/components/ui/consistent-button"
 import { ErrorState } from "@/components/ui/error-state"
 
 export function VirtualMachineListView() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [selectedVMs, setSelectedVMs] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState("")
@@ -82,6 +84,19 @@ export function VirtualMachineListView() {
     }
   }
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "Running":
+        return t('vm.running')
+      case "Shutoff":
+        return t('vm.stopped')
+      case "Paused":
+        return t('vm.paused')
+      default:
+        return status
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     let variant = "default"
     let color = "primary"
@@ -118,7 +133,7 @@ export function VirtualMachineListView() {
         status === "Paused" ? "bg-yellow-500 text-white border-yellow-500/20" : ""
       )}>
         {React.createElement(icon, { className: "h-3 w-3" })}
-        <span className="hidden sm:inline capitalize">{status.toLowerCase()}</span>
+        <span className="hidden sm:inline">{getStatusText(status)}</span>
       </Badge>
     )
   }
@@ -268,7 +283,7 @@ export function VirtualMachineListView() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-foreground">Loading virtual machines...</span>
+          <span className="text-foreground">{t('vm.loadingVMs')}</span>
         </div>
       </div>
     )
@@ -278,7 +293,7 @@ export function VirtualMachineListView() {
     return (
       <div className={`${SPACING.section} ${SPACING.page}`}>
         <ErrorState 
-          title="Error Loading VMs"
+          title={t('vm.errorLoadingVMs')}
           description={error}
         />
       </div>
@@ -290,25 +305,25 @@ export function VirtualMachineListView() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Virtual Machines</h1>
-          <p className="text-muted-foreground">Manage and monitor your virtual machine fleet</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('vm.virtualMachines')}</h1>
+          <p className="text-muted-foreground">{t('vm.manageFleet')}</p>
         </div>
         <div className="flex gap-2">
           {selectedVMs.length > 0 && (
             <div className="flex gap-2">
               <ConsistentButton variant="outline" size="sm" className="hover-fast shadow-sm">
                 <Play className="h-4 w-4" />
-                Start ({selectedVMs.length})
+                {t('vm.start')} ({selectedVMs.length})
               </ConsistentButton>
               <ConsistentButton variant="outline" size="sm" className="hover-fast shadow-sm">
                 <Square className="h-4 w-4" />
-                Stop ({selectedVMs.length})
+                {t('vm.stop')} ({selectedVMs.length})
               </ConsistentButton>
             </div>
           )}
           <ConsistentButton className="bg-primary text-primary-foreground hover:bg-primary/90 hover-fast shadow-md hover:shadow-lg" onClick={handleCreateVM}>
             <Plus className="h-4 w-4" />
-            Create VM
+            {t('vm.createVM')}
           </ConsistentButton>
         </div>
       </div>
@@ -321,7 +336,7 @@ export function VirtualMachineListView() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search VMs by name, OS, or IP..."
+                  placeholder={t('vm.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 border-border/50 bg-surface-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -330,13 +345,13 @@ export function VirtualMachineListView() {
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-36 border-border/50 bg-surface-2">
                   <Filter className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="All Status" />
+                  <SelectValue placeholder={t('vm.allStatus')} />
                 </SelectTrigger>
                 <SelectContent className="bg-surface-2 border-border/50 shadow-lg">
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="Running">Running</SelectItem>
-                  <SelectItem value="Shutoff">Stopped</SelectItem>
-                  <SelectItem value="Paused">Paused</SelectItem>
+                  <SelectItem value="all">{t('vm.allStatus')}</SelectItem>
+                  <SelectItem value="Running">{t('vm.running')}</SelectItem>
+                  <SelectItem value="Shutoff">{t('vm.stopped')}</SelectItem>
+                  <SelectItem value="Paused">{t('vm.paused')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -344,14 +359,14 @@ export function VirtualMachineListView() {
               <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
                 <SelectTrigger className="w-44 border-border/50 bg-surface-2">
                   <ArrowUpDown className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <SelectValue placeholder="Sort by Name" />
+                  <SelectValue placeholder={t('vm.sortByName')} />
                 </SelectTrigger>
                 <SelectContent className="bg-surface-2 border-border/50 shadow-lg">
-                  <SelectItem value="name">Sort by Name</SelectItem>
-                  <SelectItem value="status">Sort by Status</SelectItem>
-                  <SelectItem value="uptime">Sort by Uptime</SelectItem>
-                  <SelectItem value="cpu">Sort by CPU</SelectItem>
-                  <SelectItem value="memory">Sort by Memory</SelectItem>
+                  <SelectItem value="name">{t('vm.sortByName')}</SelectItem>
+                  <SelectItem value="status">{t('vm.sortByStatus')}</SelectItem>
+                  <SelectItem value="uptime">{t('vm.sortByUptime')}</SelectItem>
+                  <SelectItem value="cpu">{t('vm.sortByCPU')}</SelectItem>
+                  <SelectItem value="memory">{t('vm.sortByMemory')}</SelectItem>
                 </SelectContent>
               </Select>
               <ConsistentButton 
@@ -371,9 +386,9 @@ export function VirtualMachineListView() {
       <Card className="shadow-sm border-border/50">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
-            <span className="text-lg font-semibold">Virtual Machines ({sortedVMs.length})</span>
+            <span className="text-lg font-semibold">{t('vm.virtualMachines')} ({sortedVMs.length})</span>
             {selectedVMs.length > 0 && (
-              <span className="text-sm font-normal text-muted-foreground">{selectedVMs.length} selected</span>
+              <span className="text-sm font-normal text-muted-foreground">{selectedVMs.length} {t('vm.selected')}</span>
             )}
           </CardTitle>
         </CardHeader>
@@ -387,13 +402,13 @@ export function VirtualMachineListView() {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead className="px-4">Status</TableHead>
-                <TableHead className="px-4">Name</TableHead>
-                <TableHead className="px-4">vCPUs</TableHead>
-                <TableHead className="px-4">Memory</TableHead>
-                <TableHead className="px-4">Primary IP</TableHead>
-                <TableHead className="px-4">Uptime</TableHead>
-                <TableHead className="px-4">OS</TableHead>
+                <TableHead className="px-4">{t('common.status')}</TableHead>
+                <TableHead className="px-4">{t('common.name')}</TableHead>
+                <TableHead className="px-4">{t('vm.cpu_cores')}</TableHead>
+                <TableHead className="px-4">{t('vm.memory')}</TableHead>
+                <TableHead className="px-4">{t('vm.ipAddress')}</TableHead>
+                <TableHead className="px-4">{t('vm.uptime')}</TableHead>
+                <TableHead className="px-4">{t('vm.os')}</TableHead>
                 <TableHead className="w-12 pr-4"></TableHead>
               </TableRow>
             </TableHeader>
@@ -432,7 +447,7 @@ export function VirtualMachineListView() {
                       onClick={() => navigateTo(routes.vmDetail(vm.uuid))}
                     >
                       <Eye className="mr-1 h-3 w-3" />
-                      <span className="text-xs">Details</span>
+                      <span className="text-xs">{t('vm.details')}</span>
                     </ConsistentButton>
                   </TableCell>
                 </TableRow>

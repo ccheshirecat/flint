@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { I18nProvider } from "@/components/i18n-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Suspense } from "react";
 import "./globals.css"
@@ -60,15 +61,17 @@ export default function RootLayout({
             </div>
           </div>
         }>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange={false} // Enable smooth theme transitions
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
+          <I18nProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange={false} // Enable smooth theme transitions
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </I18nProvider>
         </Suspense>
       </body>
     </html>

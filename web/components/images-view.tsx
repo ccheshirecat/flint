@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -47,6 +48,7 @@ import { ConsistentButton } from "@/components/ui/consistent-button"
 import { ErrorState } from "@/components/ui/error-state"
 
 export function ImagesView() {
+  const { t } = useTranslation()
   const [images, setImages] = useState<Image[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -203,7 +205,7 @@ export function ImagesView() {
   if (error) {
     return (
       <ErrorState 
-        title="Error Loading Images"
+        title={t('images.errorLoadingImages')}
         description={error}
       />
     )

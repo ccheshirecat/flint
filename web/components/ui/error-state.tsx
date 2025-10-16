@@ -7,6 +7,7 @@ import { AlertCircle, RefreshCw } from "lucide-react"
 import { ConsistentButton } from "./consistent-button"
 import { SPACING, TYPOGRAPHY } from "@/lib/ui-constants"
 import { refreshPage } from "@/lib/navigation"
+import { useTranslation } from "@/components/i18n-provider"
 
 interface ErrorStateProps {
   title?: string
@@ -23,6 +24,7 @@ export function ErrorState({
   onRetry,
   className = ""
 }: ErrorStateProps) {
+  const { t } = useTranslation()
   const handleRetry = () => {
     if (onRetry) {
       onRetry()
@@ -51,7 +53,7 @@ export function ErrorState({
             onClick={handleRetry}
             icon={<RefreshCw className="h-4 w-4" />}
           >
-            Try Again
+            {t('images.tryAgain')}
           </ConsistentButton>
         )}
       </div>

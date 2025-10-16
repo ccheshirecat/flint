@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -25,27 +26,27 @@ interface Pool {
 }
 
 // Create a dedicated component for rendering the status badge
-const PoolStatusBadge = ({ state }: { state: Pool['state'] }) => {
+const PoolStatusBadge = ({ state, t }: { state: Pool['state'], t: (key: string) => string }) => {
   switch (state) {
     case "Active":
       return (
         <Badge className="bg-primary text-primary-foreground">
           <Activity className="mr-1 h-3 w-3" />
-          Active
+          {t('vm.active')}
         </Badge>
       );
     case "Inactive":
       return (
         <Badge variant="secondary">
           <PowerOff className="mr-1 h-3 w-3" />
-          Inactive
+          {t('vm.inactive')}
         </Badge>
       );
     case "Building":
       return (
         <Badge variant="outline" className="text-blue-500 border-blue-500">
           <Construction className="mr-1 h-3 w-3" />
-          Building
+          {t('vm.building')}
         </Badge>
       );
     case "Degraded":
@@ -57,11 +58,12 @@ const PoolStatusBadge = ({ state }: { state: Pool['state'] }) => {
         </Badge>
       );
     default:
-      return <Badge variant="outline">Unknown</Badge>;
+      return <Badge variant="outline">{t('vm.unknown')}</Badge>;
   }
 };
 
 export function StorageView() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [storagePools, setStoragePools] = useState<StoragePool[]>([])
   const [volumes, setVolumes] = useState<Volume[]>([])
@@ -188,7 +190,7 @@ export function StorageView() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin" />
-          <span>Loading storage data...</span>
+          <span>{t('vm.loadingStorageData')}</span>
         </div>
       </div>
     )
@@ -198,7 +200,7 @@ export function StorageView() {
     return (
       <div className={`${SPACING.section} ${SPACING.page}`}>
         <ErrorState 
-          title="Error Loading Storage"
+          title={t('vm.errorLoadingStorage')}
           description={error}
         />
       </div>
@@ -209,8 +211,8 @@ export function StorageView() {
     <div className={`${SPACING.section} ${SPACING.page}`}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className={TYPOGRAPHY.pageTitle}>Storage</h1>
-          <p className="text-muted-foreground">Manage storage pools and virtual disk volumes</p>
+          <h1 className={TYPOGRAPHY.pageTitle}>{t('storage.title')}</h1>
+          <p className="text-muted-foreground">{t('storage.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Dialog>
@@ -219,36 +221,36 @@ export function StorageView() {
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
                 icon={<Plus className="h-4 w-4" />}
               >
-                Create Pool
+                {t('storage.createPool')}
               </ConsistentButton>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create Storage Pool</DialogTitle>
+                <DialogTitle>{t('storage.createPool')}</DialogTitle>
                 <DialogDescription>
-                  Create a new storage pool for virtual machine disks
+                  {t('storage.createPoolDescription')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="pool-name">Pool Name</Label>
+                  <Label htmlFor="pool-name">{t('vm.poolName')}</Label>
                   <Input id="pool-name" placeholder="e.g., vm-storage" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pool-path">Storage Path</Label>
+                  <Label htmlFor="pool-path">{t('vm.storagePath')}</Label>
                   <Input id="pool-path" placeholder="/var/lib/libvirt/images" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pool-type">Pool Type</Label>
+                  <Label htmlFor="pool-type">{t('vm.poolType')}</Label>
                   <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                    <option value="dir">Directory</option>
-                    <option value="fs">Filesystem</option>
-                    <option value="netfs">Network Filesystem</option>
+                    <option value="dir">{t('storage.directory')}</option>
+                    <option value="fs">{t('storage.filesystem')}</option>
+                    <option value="netfs">{t('storage.networkFilesystem')}</option>
                   </select>
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit">Create Pool</Button>
+                <Button type="submit">{t('storage.createPool')}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -261,7 +263,7 @@ export function StorageView() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Pools</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('vm.totalPools')}</p>
                 <p className="text-2xl font-bold">{storagePools.length}</p>
               </div>
               <HardDrive className="h-8 w-8 text-muted-foreground" />
@@ -273,7 +275,7 @@ export function StorageView() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Active Pools</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('vm.activePools')}</p>
                 <p className="text-2xl font-bold text-primary">
                   {(storagePools || []).filter((pool) => pool.allocation_b > 0).length}
                 </p>
@@ -287,7 +289,7 @@ export function StorageView() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Capacity</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('vm.totalCapacity')}</p>
                 <p className="text-2xl font-bold">
                   {hostResources ? formatSize(hostResources.storage_total_b) : formatSize(storagePools.reduce((acc, pool) => acc + pool.capacity_b, 0))}
                 </p>
@@ -301,7 +303,7 @@ export function StorageView() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Volumes</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('vm.totalVolumes')}</p>
                 <p className="text-2xl font-bold">{volumes.length}</p>
               </div>
               <HardDrive className="h-8 w-8 text-muted-foreground" />
@@ -313,8 +315,8 @@ export function StorageView() {
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mt-4">
-          <TabsTrigger value="pools">Storage Pools</TabsTrigger>
-          <TabsTrigger value="volumes">All Volumes</TabsTrigger>
+          <TabsTrigger value="pools">{t('storage.pools')}</TabsTrigger>
+          <TabsTrigger value="volumes">{t('vm.allVolumes')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pools" className="space-y-6 mt-6">
@@ -324,7 +326,7 @@ export function StorageView() {
               <Card>
                 <CardHeader className="pb-4">
                   <CardTitle className="flex items-center justify-between">
-                    Storage Pools
+                    {t('storage.pools')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 pb-4">
@@ -339,14 +341,14 @@ export function StorageView() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">{pool.name}</p>
-                          <p className="text-xs text-muted-foreground">Storage Pool</p>
+                          <p className="text-xs text-muted-foreground">{t('vm.storagePool')}</p>
                         </div>
-                        <PoolStatusBadge state="Active" />
+                        <PoolStatusBadge state="Active" t={t} />
                       </div>
                       <div className="mt-2">
                         <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{formatSize(pool.allocation_b)} used</span>
-                          <span>{formatSize(pool.capacity_b)} total</span>
+                          <span>{formatSize(pool.allocation_b)} {t('vm.used')}</span>
+                          <span>{formatSize(pool.capacity_b)} {t('vm.total')}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
                           <div
@@ -375,12 +377,12 @@ export function StorageView() {
                               size="sm"
                               icon={<Plus className="h-4 w-4" />}
                             >
-                              Create Volume
+                              {t('storage.createVolume')}
                             </ConsistentButton>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                              <DialogTitle>Create New Volume</DialogTitle>
+                              <DialogTitle>{t('vm.createNewVolume')}</DialogTitle>
                               <DialogDescription>
                                 Create a new storage volume in the {selectedPool.name} pool.
                               </DialogDescription>
@@ -388,7 +390,7 @@ export function StorageView() {
                             <div className="grid gap-4 py-4">
                               <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="name" className="text-right">
-                                  Name
+                                  {t('common.name')}
                                 </Label>
                                 <Input
                                   id="name"
@@ -400,7 +402,7 @@ export function StorageView() {
                               </div>
                               <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="size" className="text-right">
-                                  Size (GB)
+                                  {t('vm.sizeGB')}
                                 </Label>
                                 <Input
                                   id="size"
@@ -421,10 +423,10 @@ export function StorageView() {
                                 {isCreatingVolume ? (
                                   <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Creating...
+                                    {t('vm.creating')}
                                   </>
                                 ) : (
-                                  "Create Volume"
+                                  t('storage.createVolume')
                                 )}
                               </Button>
                             </DialogFooter>
@@ -437,15 +439,15 @@ export function StorageView() {
                     {/* Pool Information */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Type</p>
-                        <p className="font-semibold">Storage Pool</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t('vm.type')}</p>
+                        <p className="font-semibold">{t('vm.storagePool')}</p>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-muted-foreground">Status</p>
-                        <PoolStatusBadge state="Active" />
+                        <p className="text-sm font-medium text-muted-foreground">{t('vm.status')}</p>
+                        <PoolStatusBadge state="Active" t={t} />
                       </div>
                       <div className="col-span-2">
-                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p className="text-sm font-medium text-muted-foreground">{t('common.name')}</p>
                         <p className="font-mono text-sm">{selectedPool.name}</p>
                       </div>
                     </div>
@@ -453,7 +455,7 @@ export function StorageView() {
                     {/* Storage Usage */}
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Storage Usage</span>
+                        <span className="text-muted-foreground">{t('vm.storageUsage')}</span>
                         <span className="font-medium">
                           {formatSize(selectedPool.allocation_b)} / {formatSize(selectedPool.capacity_b)}
                         </span>
@@ -465,8 +467,8 @@ export function StorageView() {
                         ></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>{formatSize(selectedPool.capacity_b - selectedPool.allocation_b)} available</span>
-                        <span>{((selectedPool.allocation_b / selectedPool.capacity_b) * 100).toFixed(1)}% used</span>
+                        <span>{formatSize(selectedPool.capacity_b - selectedPool.allocation_b)} {t('vm.available')}</span>
+                        <span>{((selectedPool.allocation_b / selectedPool.capacity_b) * 100).toFixed(1)}% {t('vm.used')}</span>
                       </div>
                     </div>
 
@@ -476,11 +478,11 @@ export function StorageView() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Format</TableHead>
-                            <TableHead>Capacity</TableHead>
-                            <TableHead>Allocation</TableHead>
-                            <TableHead>Used By</TableHead>
+                            <TableHead>{t('common.name')}</TableHead>
+                            <TableHead>{t('vm.format')}</TableHead>
+                            <TableHead>{t('vm.capacity')}</TableHead>
+                            <TableHead>{t('vm.allocation')}</TableHead>
+                            <TableHead>{t('vm.usedBy')}</TableHead>
                             <TableHead></TableHead>
                           </TableRow>
                         </TableHeader>
@@ -492,7 +494,7 @@ export function StorageView() {
                               <TableCell>{formatSize(volume.capacity_b)}</TableCell>
                               <TableCell>{formatSize(volume.capacity_b)}</TableCell>
                               <TableCell>
-                                <span className="text-muted-foreground">Unknown</span>
+                                <span className="text-muted-foreground">{t('vm.unknown')}</span>
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-1">
@@ -561,238 +563,7 @@ export function StorageView() {
             </div>
           </div>
         </TabsContent>
-
-        <TabsContent value="volumes" className="space-y-6 mt-6">
-          <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center justify-between">
-                All Volumes ({volumes.length})
-                <Dialog open={isCreateVolumeDialogOpen} onOpenChange={setIsCreateVolumeDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm">
-                      <Plus className="h-4 w-4" />
-                      Create Volume
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Create New Volume</DialogTitle>
-                      <DialogDescription>
-                        Create a new storage volume.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
-                          Name
-                        </Label>
-                        <Input
-                          id="name"
-                          value={newVolumeName}
-                          onChange={(e) => setNewVolumeName(e.target.value)}
-                          className="col-span-3"
-                          placeholder="e.g., my-disk"
-                        />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="size" className="text-right">
-                          Size (GB)
-                        </Label>
-                        <Input
-                          id="size"
-                          type="number"
-                          min="1"
-                          value={newVolumeSize}
-                          onChange={(e) => setNewVolumeSize(Number(e.target.value))}
-                          className="col-span-3"
-                        />
-                      </div>
-                      {selectedPool && (
-                        <div className="grid grid-cols-4 items-center gap-4">
-                          <Label htmlFor="pool" className="text-right">
-                            Pool
-                          </Label>
-                          <div className="col-span-3">
-                            <select
-                              value={selectedPool.name}
-                              onChange={(e) => {
-                                const pool = storagePools.find(p => p.name === e.target.value)
-                                if (pool) setSelectedPool(pool)
-                              }}
-                              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              {(storagePools || []).map(pool => (
-                                <option key={pool.name} value={pool.name}>{pool.name}</option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <DialogFooter>
-                      <Button 
-                        type="submit" 
-                        onClick={handleCreateVolume}
-                        disabled={isCreatingVolume || !newVolumeName || !selectedPool}
-                      >
-                        {isCreatingVolume ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Creating...
-                          </>
-                        ) : (
-                          "Create Volume"
-                        )}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Pool</TableHead>
-                    <TableHead>Format</TableHead>
-                    <TableHead>Capacity</TableHead>
-                    <TableHead>Allocation</TableHead>
-                    <TableHead>Used By</TableHead>
-                    <TableHead>Path</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(volumes || []).map((volume) => (
-                    <TableRow key={volume.name}>
-                      <TableCell className="font-medium">{volume.name}</TableCell>
-                      <TableCell>{selectedPool?.name || "Unknown"}</TableCell>
-                      <TableCell>qcow2</TableCell>
-                      <TableCell>{formatSize(volume.capacity_b)}</TableCell>
-                      <TableCell>{formatSize(volume.capacity_b)}</TableCell>
-                      <TableCell>
-                        <span className="text-muted-foreground">Unknown</span>
-                      </TableCell>
-                      <TableCell className="font-mono text-xs max-w-xs truncate">{volume.path}</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            setEditingVolume(volume)
-                            setEditVolumeSize(Math.round(volume.capacity_b / (1024 * 1024 * 1024)))
-                            setIsEditDialogOpen(true)
-                          }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
-
-      {/* Edit Volume Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Volume</DialogTitle>
-            <DialogDescription>
-              Modify volume settings. Note: Only expansion is supported for safety.
-            </DialogDescription>
-          </DialogHeader>
-          {editingVolume && (
-            <form onSubmit={async (e) => {
-              e.preventDefault()
-              if (!editingVolume || !selectedPool?.name) return
-
-              try {
-                const response = await fetch(`/api/storage-pools/${selectedPool.name}/volumes/${editingVolume.name}`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  credentials: 'include',
-                  body: JSON.stringify({ size_gb: editVolumeSize })
-                })
-
-                if (!response.ok) {
-                  const errorData = await response.json().catch(() => ({}))
-                  throw new Error(errorData.error || `Failed to update volume (HTTP ${response.status})`)
-                }
-
-                // Refresh volumes list
-                const updatedVolumes = await storageAPI.getVolumes(selectedPool.name)
-                setVolumes(updatedVolumes)
-
-                toast({
-                  title: "Success",
-                  description: `Volume "${editingVolume.name}" updated successfully`,
-                })
-                setIsEditDialogOpen(false)
-                setEditingVolume(null)
-              } catch (err) {
-                toast({
-                  title: "Update Failed",
-                  description: err instanceof Error ? err.message : "Failed to update volume",
-                  variant: "destructive",
-                })
-              }
-            }}>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="edit-volume-name" className="text-right">
-                    Name
-                  </Label>
-                  <Input
-                    id="edit-volume-name"
-                    value={editingVolume.name}
-                    className="col-span-3"
-                    disabled
-                    title="Volume name cannot be changed"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="edit-volume-size" className="text-right">
-                    Size (GB)
-                  </Label>
-                  <Input
-                    id="edit-volume-size"
-                    type="number"
-                    min={Math.ceil(editingVolume.capacity_b / (1024 * 1024 * 1024))}
-                    value={editVolumeSize}
-                    onChange={(e) => setEditVolumeSize(parseInt(e.target.value) || 0)}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label className="text-right">Current</Label>
-                  <div className="col-span-3 text-sm text-muted-foreground">
-                    {Math.round(editingVolume.capacity_b / (1024 * 1024 * 1024))} GB
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => {
-                  setIsEditDialogOpen(false)
-                  setEditingVolume(null)
-                }}>
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  Update Volume
-                </Button>
-              </DialogFooter>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

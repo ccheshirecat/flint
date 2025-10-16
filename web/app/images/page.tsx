@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { AppShell } from "@/components/app-shell"
 import { ImagesView } from "@/components/images-view"
 import { ImageRepository } from "@/components/image-repository"
@@ -9,6 +10,7 @@ import { HardDrive, Cloud } from "lucide-react"
 import { SPACING, TYPOGRAPHY } from "@/lib/ui-constants"
 
 export default function ImagesPage() {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("my-images")
 
   // Handle URL hash for direct navigation
@@ -33,8 +35,8 @@ export default function ImagesPage() {
         {/* Page Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <h1 className={TYPOGRAPHY.pageTitle}>Images</h1>
-            <p className="text-muted-foreground">Manage virtual machine images and cloud repository</p>
+            <h1 className={TYPOGRAPHY.pageTitle}>{t('images.title')}</h1>
+            <p className="text-muted-foreground">{t('images.subtitle')}</p>
           </div>
         </div>
         
@@ -42,11 +44,11 @@ export default function ImagesPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="my-images" className="flex items-center gap-2">
             <HardDrive className="h-4 w-4" />
-            My Images
+            {t('images.myImages')}
           </TabsTrigger>
           <TabsTrigger value="repository" className="flex items-center gap-2">
             <Cloud className="h-4 w-4" />
-            Cloud Repository
+            {t('images.cloudRepository')}
           </TabsTrigger>
         </TabsList>
 

@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { Activity, Clock, Square, RotateCcw, Play, Monitor, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/components/i18n-provider"
 
 interface VirtualMachine {
   id: number
@@ -27,6 +28,7 @@ interface VMCardProps {
 }
 
 export function VMCard({ vm, onAction }: VMCardProps) {
+  const { t } = useTranslation()
   const [isActionLoading, setIsActionLoading] = useState(false)
 
   const handleAction = async (action: string, vmId: number) => {
@@ -46,21 +48,21 @@ export function VMCard({ vm, onAction }: VMCardProps) {
         return (
           <Badge variant="default" className={cn(baseClasses, "bg-primary text-primary-foreground border-primary/20 hover:bg-primary/90 transition-colors duration-150 animate-fade-scale")}>
             <Activity className="h-3 w-3" />
-            <span>Running</span>
+            <span>{t('vm.running')}</span>
           </Badge>
         )
       case "paused":
         return (
           <Badge variant="secondary" className={cn(baseClasses, "bg-accent text-accent-foreground border-accent/20 hover:bg-accent/90 transition-colors duration-150 animate-fade-scale")}>
             <Clock className="h-3 w-3" />
-            <span>Paused</span>
+            <span>{t('vm.paused')}</span>
           </Badge>
         )
       default: // stopped
         return (
           <Badge variant="secondary" className={cn(baseClasses, "bg-muted text-muted-foreground border-border/50 hover:bg-muted/80 transition-colors duration-150 animate-fade-scale")}>
             <Square className="h-3 w-3" />
-            <span>Stopped</span>
+            <span>{t('vm.stopped')}</span>
           </Badge>
         )
     }
@@ -164,7 +166,7 @@ export function VMCard({ vm, onAction }: VMCardProps) {
       <CardContent className="space-y-4 px-4 sm:px-6 pb-4">
         <div className="space-y-2">
           <div className="flex justify-between text-xs sm:text-sm">
-            <span className="text-muted-foreground font-medium">CPU</span>
+            <span className="text-muted-foreground font-medium">{t('vm.cpu')}</span>
             <span className="font-semibold tabular-nums text-foreground">{vm.cpu}%</span>
           </div>
           <Progress
@@ -175,7 +177,7 @@ export function VMCard({ vm, onAction }: VMCardProps) {
 
         <div className="space-y-2">
           <div className="flex justify-between text-xs sm:text-sm">
-            <span className="text-muted-foreground font-medium">Memory</span>
+            <span className="text-muted-foreground font-medium">{t('common.memory')}</span>
             <span className="font-semibold tabular-nums text-foreground">
               {vm.memory.used}GB / {vm.memory.total}GB
             </span>
@@ -188,7 +190,7 @@ export function VMCard({ vm, onAction }: VMCardProps) {
 
         <div className="flex justify-between text-xs text-muted-foreground pt-1 border-t border-border/30">
           <span>
-            Uptime: <span className="tabular-nums font-medium">{vm.uptime}</span>
+            {t('vm.uptime')}: <span className="tabular-nums font-medium">{vm.uptime}</span>
           </span>
         </div>
 
