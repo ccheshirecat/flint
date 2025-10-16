@@ -212,7 +212,7 @@ export function DashboardView() {
   }
 
   if (isLoading) {
-    return <LoadingState title={t('common.loading')} description="Please wait while we fetch your data" />
+    return <LoadingState title={t('common.loading')} description={t('common.loadingDescription')} />
   }
 
   if (error || !hostResources || !hostStatus) {
@@ -220,7 +220,7 @@ export function DashboardView() {
       <div className={SPACING.section}>
         <ErrorState 
           title={t('common.error')}
-          description={error || "Failed to load dashboard data"}
+          description={error || t('common.failedToLoadData')}
         />
       </div>
     )

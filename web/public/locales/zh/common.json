@@ -10,7 +10,9 @@
   },
   "common": {
     "loading": "加载中...",
+    "loadingDescription": "请稍候，我们正在获取您的数据",
     "error": "错误",
+    "failedToLoadData": "加载仪表板数据失败",
     "success": "成功",
     "cancel": "取消",
     "confirm": "确认",
@@ -461,6 +463,9 @@
     "totalMemory": "总内存",
     "storagePath": "存储路径",
     "loadingSystemInfo": "正在加载系统信息...",
+    "notifications": "通知",
+    "language": "语言",
+    "theme": "主题",
     "restore": "恢复",
     "export": "导出",
     "import": "导入"
