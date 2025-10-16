@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,7 @@ interface VMTemplatesProps {
 }
 
 export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
+  const { t } = useTranslation()
   const [templates, setTemplates] = useState<VMTemplate[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
@@ -90,8 +92,8 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
       const newVM = await response.json()
       
       toast({
-        title: "VM Created from Template!",
-        description: `${newVMName} is starting up from ${selectedTemplate.name}`,
+        title: t('vm.vmCreatedFromTemplate'),
+        description: `${newVMName} ${t('vm.isStartingUpFrom')} ${selectedTemplate.name}`,
       })
 
       onLaunchFromTemplate?.(selectedTemplate.id, newVMName)
@@ -99,8 +101,8 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
       setNewVMName("")
     } catch (error) {
       toast({
-        title: "Creation Failed",
-        description: error instanceof Error ? error.message : "Failed to create VM",
+        title: t('vm.creationFailed'),
+        description: error instanceof Error ? error.message : t('vm.failedToCreateVM'),
         variant: "destructive",
       })
     } finally {
@@ -118,7 +120,7 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-center">
             <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            <span>Loading templates...</span>
+            <span>{t('vm.loadingTemplates')}...</span>
           </div>
         </CardContent>
       </Card>
@@ -131,15 +133,15 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="h-5 w-5" />
-            VM Templates
+            {t('vm.vmTemplates')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-6">
             <Camera className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground mb-2">No templates available</p>
+            <p className="text-muted-foreground mb-2">{t('vm.noTemplatesAvailable')}</p>
             <p className="text-sm text-muted-foreground">
-              Create a VM, then snapshot it to make reusable templates
+              {t('vm.createVMThenSnapshot')}
             </p>
           </div>
         </CardContent>
@@ -152,10 +154,10 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Camera className="h-5 w-5" />
-          Quick Launch Templates
+          {t('vm.quickLaunchTemplates')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Launch VMs instantly from pre-configured templates
+          {t('vm.launchVMsInstantly')}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -198,35 +200,35 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
                     onClick={() => setSelectedTemplate(template)}
                   >
                     <Play className="mr-1 h-3 w-3" />
-                    Launch
+                    {t('vm.launch')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Launch VM from Template</DialogTitle>
+                    <DialogTitle>{t('vm.launchVMFromTemplate')}</DialogTitle>
                     <DialogDescription>
-                      Create a new VM based on the "{template.name}" template
+                      {t('vm.createNewVMBasedOn')} "{template.name}" {t('vm.template')}
                     </DialogDescription>
                   </DialogHeader>
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="vm-name">VM Name</Label>
+                      <Label htmlFor="vm-name">{t('vm.vmName')}</Label>
                       <Input
                         id="vm-name"
-                        placeholder="e.g., web-server-02"
+                        placeholder={t('vm.vmNamePlaceholder2')}
                         value={newVMName}
                         onChange={(e) => setNewVMName(e.target.value)}
                       />
                     </div>
                     
                     <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-sm font-medium mb-2">Template Configuration:</p>
+                      <p className="text-sm font-medium mb-2">{t('vm.templateConfiguration')}:</p>
                       <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                         <span>vCPUs: {template.vcpus}</span>
-                        <span>Memory: {formatMemory(template.memory)}</span>
-                        <span>Disk: {template.diskSize}GB</span>
-                        <span>Source: {template.sourceVM}</span>
+                        <span>{t('vm.memory')}: {formatMemory(template.memory)}</span>
+                        <span>{t('vm.disk')}: {template.diskSize}GB</span>
+                        <span>{t('vm.source')}: {template.sourceVM}</span>
                       </div>
                     </div>
                   </div>
@@ -239,12 +241,12 @@ export function VMTemplates({ onLaunchFromTemplate }: VMTemplatesProps) {
                       {isCreating ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Creating...
+                          {t('vm.creating')}...
                         </>
                       ) : (
                         <>
                           <Play className="mr-2 h-4 w-4" />
-                          Launch VM
+                          {t('vm.launchVM')}
                         </>
                       )}
                     </Button>

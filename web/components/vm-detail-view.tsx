@@ -684,7 +684,7 @@ export default function VMDetailView() {
                  <div className="grid grid-cols-2 gap-4">
                    <div>
                      <p className="text-sm font-medium text-muted-foreground">{t('vm.cpu_cores')}</p>
-                     <p className="text-lg font-semibold">{vmData.vcpus}</p>
+                     <p className="text-lg font-bold">{vmData.vcpus}</p>
                    </div>
                    <div>
                      <p className="text-sm font-medium text-muted-foreground">{t('vm.memory')}</p>
@@ -740,7 +740,7 @@ export default function VMDetailView() {
                      <p className="text-xs text-muted-foreground">{t('vm.cpuLoad')}</p>
                    </div>
                    <div>
-                     <p className="text-2xl font-bold text-accent">{vmData.vcpus}</p>
+                     <p className="text-2xl font-bold text-primary">{vmData.vcpus}</p>
                      <p className="text-xs text-muted-foreground">{t('vm.cpu_cores')}</p>
                    </div>
                  </div>
