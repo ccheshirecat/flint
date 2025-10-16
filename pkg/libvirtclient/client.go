@@ -59,6 +59,7 @@ type ClientInterface interface {
 	
 	// Storage operations
 	UpdateVolume(poolName string, volumeName string, config core.VolumeConfig) error
+	DeleteVolume(poolName string, volumeName string) error
 	
 	// Network operations  
 	UpdateNetwork(name string, bridgeName string) error

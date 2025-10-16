@@ -374,7 +374,14 @@
     "volumeName": "存储卷名称",
     "volumeSize": "存储卷大小 (GB)",
     "editVolume": "编辑存储卷",
-    "deleteVolume": "删除存储卷"
+    "deleteVolume": "删除存储卷",
+    "confirmDeleteVolume": "您确定要删除存储卷\"{name}\"吗？",
+    "deleteSuccess": "成功",
+    "volumeDeletedSuccess": "存储卷\"{name}\"删除成功",
+    "deleteFailed": "删除失败",
+    "noPoolSelected": "未选择存储池",
+    "createPoolDescription": "创建一个新的存储池来管理虚拟磁盘",
+    "createVolumeDescription": "在选定的存储池中创建一个新的存储卷"
   },
   "networking": {
     "title": "网络",

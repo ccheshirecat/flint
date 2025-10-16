@@ -384,7 +384,7 @@ export function StorageView() {
                             <DialogHeader>
                               <DialogTitle>{t('vm.createNewVolume')}</DialogTitle>
                               <DialogDescription>
-                                Create a new storage volume in the {selectedPool.name} pool.
+                                {t('storage.createVolumeDescription')}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
@@ -474,7 +474,7 @@ export function StorageView() {
 
                     {/* Volumes in Pool */}
                     <div>
-                      <h3 className="font-medium mb-2">Volumes ({volumes.length})</h3>
+                      <h3 className="font-medium mb-2">{t('storage.volumes')} ({volumes.length})</h3>
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -517,31 +517,26 @@ export function StorageView() {
                                     onClick={async () => {
                                       if (!selectedPool?.name) {
                                         toast({
-                                          title: "Error",
-                                          description: "No storage pool selected",
+                                          title: t('common.error'),
+                                          description: t('storage.noPoolSelected'),
                                           variant: "destructive",
                                         })
                                         return
                                       }
                                       
-                                      if (confirm(`Are you sure you want to delete volume "${volume.name}"?`)) {
+                                      if (confirm(t('storage.confirmDeleteVolume').replace('{name}', volume.name))) {
                                         try {
-                                          const response = await fetch(`/api/storage-pools/${selectedPool!.name}/volumes/${volume.name}`, {
-                                            method: 'DELETE',
-                                          })
-                                          if (!response.ok) {
-                                            throw new Error('Failed to delete volume')
-                                          }
+                                          await storageAPI.deleteVolume(selectedPool!.name, volume.name)
                                           const updatedVolumes = await storageAPI.getVolumes(selectedPool!.name)
                                           setVolumes(updatedVolumes)
                                           toast({
-                                            title: "Success",
-                                            description: `Volume "${volume.name}" deleted successfully`,
+                                            title: t('storage.deleteSuccess'),
+                                            description: t('storage.volumeDeletedSuccess').replace('{name}', volume.name),
                                           })
                                         } catch (err) {
                                           toast({
-                                            title: "Delete Failed",
-                                            description: err instanceof Error ? err.message : "Failed to delete volume",
+                                            title: t('storage.deleteFailed'),
+                                            description: err instanceof Error ? err.message : t('storage.deleteVolume'),
                                             variant: "destructive",
                                           })
                                         }

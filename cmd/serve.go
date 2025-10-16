@@ -234,6 +234,10 @@ func (d *dummyClient) UpdateVolume(poolName string, volumeName string, config co
 	return fmt.Errorf("not implemented in dummy client")
 }
 
+func (d *dummyClient) DeleteVolume(poolName string, volumeName string) error {
+	return fmt.Errorf("not implemented in dummy client")
+}
+
 func (d *dummyClient) UpdateNetwork(name string, bridgeName string) error {
 	return fmt.Errorf("not implemented in dummy client")
 }

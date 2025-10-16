@@ -237,6 +237,10 @@ export const storageAPI = {
       method: "POST",
       body: JSON.stringify(config),
     }),
+  deleteVolume: (poolName: string, volumeName: string): Promise<void> =>
+    apiRequest(`/storage-pools/${poolName}/volumes/${volumeName}`, {
+      method: "DELETE",
+    }),
 }
 
 // Network API types

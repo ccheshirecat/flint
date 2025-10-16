@@ -374,7 +374,14 @@
     "volumeName": "Volume Name",
     "volumeSize": "Volume Size (GB)",
     "editVolume": "Edit Volume",
-    "deleteVolume": "Delete Volume"
+    "deleteVolume": "Delete Volume",
+    "confirmDeleteVolume": "Are you sure you want to delete volume \"{name}\"?",
+    "deleteSuccess": "Success",
+    "volumeDeletedSuccess": "Volume \"{name}\" deleted successfully",
+    "deleteFailed": "Delete Failed",
+    "noPoolSelected": "No storage pool selected",
+    "createPoolDescription": "Create a new storage pool to manage virtual disks",
+    "createVolumeDescription": "Create a new storage volume in the selected pool"
   },
   "networking": {
     "title": "Networking",
