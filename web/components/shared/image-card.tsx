@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -31,6 +32,7 @@ interface ImageCardProps {
 }
 
 export function ImageCard({ image, onAction, onDelete }: ImageCardProps) {
+  const { t } = useTranslation()
   const [isDeleting, setIsDeleting] = useState(false)
 
   const getStatusBadge = (status: string) => {
@@ -39,28 +41,28 @@ export function ImageCard({ image, onAction, onDelete }: ImageCardProps) {
         return (
           <Badge className="bg-primary text-primary-foreground">
             <CheckCircle className="mr-1 h-3 w-3" />
-            Available
+            {t('images.available')}
           </Badge>
         )
       case "uploading":
         return (
           <Badge className="bg-accent text-accent-foreground">
             <Upload className="mr-1 h-3 w-3" />
-            Uploading
+            {t('images.uploading')}
           </Badge>
         )
       case "downloading":
         return (
           <Badge className="bg-accent text-accent-foreground">
             <Download className="mr-1 h-3 w-3" />
-            Downloading
+            {t('images.downloading')}
           </Badge>
         )
       case "error":
         return (
           <Badge variant="destructive">
             <XCircle className="mr-1 h-3 w-3" />
-            Error
+            {t('images.error')}
           </Badge>
         )
       default:
@@ -81,7 +83,7 @@ export function ImageCard({ image, onAction, onDelete }: ImageCardProps) {
 
   const formatSize = (bytes: number) => {
   if (bytes == null || isNaN(bytes) || bytes < 0) {
-    return "Unknown"
+    return t('images.unknown')
   }
     const units = ['B', 'KB', 'MB', 'GB', 'TB']
     let size = bytes
@@ -98,7 +100,7 @@ export function ImageCard({ image, onAction, onDelete }: ImageCardProps) {
   const handleDelete = async () => {
     if (!onDelete) return
     
-    if (!confirm(`Are you sure you want to delete "${image.name}"? This action cannot be undone.`)) {
+    if (!confirm(t('images.confirmDelete').replace('{name}', image.name))) {
       return
     }
     
@@ -147,25 +149,25 @@ export function ImageCard({ image, onAction, onDelete }: ImageCardProps) {
         
         <div className="space-y-3 text-sm">
           <div className="flex justify-between items-start">
-            <span className="text-muted-foreground">Size</span>
+            <span className="text-muted-foreground">{t('images.size')}</span>
             <span className="font-medium text-right">{formatSize(image.size_b)}</span>
           </div>
           
           {image.os_info && (
             <div className="flex justify-between items-start">
-              <span className="text-muted-foreground">OS</span>
+              <span className="text-muted-foreground">{t('images.os')}</span>
               <span className="font-medium text-right break-words max-w-[60%]">{image.os_info}</span>
             </div>
           )}
           
           <div className="flex justify-between items-start">
-            <span className="text-muted-foreground">Path</span>
+            <span className="text-muted-foreground">{t('images.path')}</span>
             <span className="font-mono text-xs text-right break-all max-w-[60%]">{image.path || `/var/lib/libvirt/images/${image.name}`}</span>
           </div>
           
           <div className="flex justify-between items-start">
-            <span className="text-muted-foreground">Created</span>
-            <span className="font-medium text-right">{image.created_at ? new Date(image.created_at).toLocaleDateString() : "Unknown"}</span>
+            <span className="text-muted-foreground">{t('images.created')}</span>
+            <span className="font-medium text-right">{image.created_at ? new Date(image.created_at).toLocaleDateString() : t('images.unknown')}</span>
           </div>
         </div>
       </CardContent>
