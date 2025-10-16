@@ -244,7 +244,7 @@ func (s *Server) webAuthMiddleware(next http.Handler) http.Handler {
 					http.Error(w, "Failed to create session", http.StatusInternalServerError)
 					return
 				}
-				
+
 				// Set secure session cookie
 				http.SetCookie(w, &http.Cookie{
 					Name:     "flint_session",
@@ -309,7 +309,7 @@ func (s *Server) validatePassphrase(passphrase string) bool {
 	}
 
 	storedHash := s.getStoredPassphraseHash()
-	
+
 	// Check if it's an old SHA256 hash (64 hex chars) and migrate to bcrypt
 	if len(storedHash) == 64 {
 		// Legacy SHA256 hash - compare directly for backward compatibility
@@ -454,7 +454,7 @@ func min(a, b int) int {
 func (s *Server) setupRoutes() {
 	// Public API endpoints (no authentication required)
 	s.router.Get("/api/health", s.handleHealthCheck())
-	
+
 	// Serial console endpoints (token-based auth, not middleware auth)
 	s.router.Get("/api/vms/{uuid}/serial-console", s.handleGetVMSerialConsole())
 	s.router.Get("/api/vms/{uuid}/serial-console/ws", s.handleVMSerialConsoleWS())
@@ -494,11 +494,12 @@ func (s *Server) setupRoutes() {
 		r.Post("/bridges", s.handleCreateBridge())
 		r.Put("/networks/{networkName}", s.handleUpdateNetwork())
 		r.Delete("/networks/{networkName}", s.handleDeleteNetwork())
+		r.Delete("/storage-pools/{poolName}/volumes/{volumeName}", s.handleDeleteVolume())
 		r.Get("/images", s.handleGetImages())
 		r.Post("/images/import-from-path", s.handleImportImageFromPath())
 		r.Post("/images/download", s.handleDownloadImage())
 		r.Delete("/images/{imageId}", s.handleDeleteImage())
-		
+
 		// Image repository endpoints
 		r.Get("/image-repository", s.handleGetRepositoryImages())
 		r.Post("/image-repository/{imageId}/download", s.handleDownloadRepositoryImage())
@@ -670,19 +671,19 @@ func (s *Server) generateSessionID() (string, error) {
 func (s *Server) isValidSession(sessionID string) bool {
 	s.sessionsMu.RLock()
 	defer s.sessionsMu.RUnlock()
-	
+
 	expiry, exists := s.sessions[sessionID]
 	if !exists {
 		return false
 	}
-	
+
 	// Check if session has expired
 	if time.Now().After(expiry) {
 		// Clean up expired session
 		go s.cleanupExpiredSession(sessionID)
 		return false
 	}
-	
+
 	return true
 }
 
@@ -692,19 +693,19 @@ func (s *Server) createSession() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	s.sessionsMu.Lock()
 	defer s.sessionsMu.Unlock()
-	
+
 	// Initialize sessions map if needed
 	if s.sessions == nil {
 		s.sessions = make(map[string]time.Time)
 	}
-	
+
 	// Session expires in 24 hours
 	expiry := time.Now().Add(24 * time.Hour)
 	s.sessions[sessionID] = expiry
-	
+
 	return sessionID, nil
 }
 
@@ -719,7 +720,7 @@ func (s *Server) cleanupExpiredSession(sessionID string) {
 func (s *Server) cleanupExpiredSessions() {
 	ticker := time.NewTicker(1 * time.Hour)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ticker.C:

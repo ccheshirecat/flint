@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -16,6 +17,7 @@ interface SystemInfo {
 }
 
 export function SettingsView() {
+  const { t } = useTranslation()
   const [systemInfo, setSystemInfo] = useState<SystemInfo>({
     hostname: "localhost",
     cpuCores: 0,
@@ -52,7 +54,7 @@ export function SettingsView() {
       <div className="container max-w-6xl py-8 px-6 sm:px-8 md:px-10">
         <div className="flex items-center justify-center min-h-[200px]">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Loading system information...</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('settings.loadingSystemInfo')}</h2>
           </div>
         </div>
       </div>
@@ -63,8 +65,8 @@ export function SettingsView() {
     <div className="container max-w-6xl py-8 px-6 sm:px-8 md:px-10">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl text-3xl font-bold tracking-tight font-bold">System Information</h1>
-          <p className="text-muted-foreground mt-1">Hardware and system details</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('settings.systemInformation')}</h1>
+          <p className="text-muted-foreground mt-1">{t('settings.systemInformationDesc')}</p>
         </div>
       </div>
 
@@ -74,14 +76,14 @@ export function SettingsView() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Monitor className="h-5 w-5" />
-              System Information
+              {t('settings.systemInformation')}
             </CardTitle>
-            <CardDescription>Hardware and system details</CardDescription>
+            <CardDescription>{t('settings.systemInformationDesc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Hostname</Label>
+                <Label>{t('settings.hostname')}</Label>
                 <Input
                   value={systemInfo.hostname}
                   readOnly
@@ -89,7 +91,7 @@ export function SettingsView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>CPU Cores</Label>
+                <Label>{t('settings.cpuCores')}</Label>
                 <Input
                   value={systemInfo.cpuCores}
                   readOnly
@@ -97,7 +99,7 @@ export function SettingsView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Total Memory</Label>
+                <Label>{t('settings.totalMemory')}</Label>
                 <Input
                   value={systemInfo.totalMemory}
                   readOnly
@@ -105,7 +107,7 @@ export function SettingsView() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Storage Path</Label>
+                <Label>{t('settings.storagePath')}</Label>
                 <Input
                   value={systemInfo.storagePath}
                   readOnly

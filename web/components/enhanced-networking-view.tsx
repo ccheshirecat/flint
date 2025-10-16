@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +30,7 @@ import { SPACING, TYPOGRAPHY, GRIDS, TRANSITIONS } from "@/lib/ui-constants"
 import { ErrorState } from "@/components/ui/error-state"
 
 export function EnhancedNetworkingView() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [virtualNetworks, setVirtualNetworks] = useState<VirtualNetwork[]>([])
   const [systemInterfaces, setSystemInterfaces] = useState<SystemInterface[]>([])
@@ -106,9 +108,9 @@ export function EnhancedNetworkingView() {
   const getStatusBadge = (state: string) => {
     switch (state.toLowerCase()) {
       case 'up':
-        return <Badge className="bg-green-500 text-white">Active</Badge>
+        return <Badge className="bg-green-500 text-white">{t('networking.active')}</Badge>
       case 'down':
-        return <Badge className="bg-red-500 text-white">Inactive</Badge>
+        return <Badge className="bg-red-500 text-white">{t('networking.inactive')}</Badge>
       default:
         return <Badge variant="outline">{state}</Badge>
     }
@@ -120,7 +122,7 @@ export function EnhancedNetworkingView() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <span>Loading network interfaces...</span>
+            <span>{t('networking.loadingNetworkInterfaces')}</span>
           </div>
         </div>
       </div>
@@ -131,7 +133,7 @@ export function EnhancedNetworkingView() {
     return (
       <div className={`${SPACING.section} ${SPACING.page}`}>
         <ErrorState 
-          title="Error Loading Network Data"
+          title={t('networking.errorLoadingNetworkData')}
           description={error}
         />
       </div>
@@ -153,24 +155,24 @@ export function EnhancedNetworkingView() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className={TYPOGRAPHY.pageTitle}>Networking</h1>
-          <p className="text-muted-foreground">Manage virtual networks and system interfaces</p>
+          <h1 className={TYPOGRAPHY.pageTitle}>{t('networking.title')}</h1>
+          <p className="text-muted-foreground">{t('networking.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <Dialog open={isCreateBridgeOpen} onOpenChange={setIsCreateBridgeOpen}>
             <DialogTrigger asChild>
               <Button variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Bridge
+                {t('networking.addBridge')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>Create Bridge Interface</DialogTitle>
+                <DialogTitle>{t('networking.createBridgeInterface')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bridge-name">Bridge Name</Label>
+                  <Label htmlFor="bridge-name">{t('networking.bridgeName')}</Label>
                   <Input
                     id="bridge-name"
                     value={bridgeName}
@@ -179,7 +181,7 @@ export function EnhancedNetworkingView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Physical Ports</Label>
+                  <Label>{t('networking.physicalPorts')}</Label>
                   <div className="space-y-2">
                     {physicalInterfaces.map(iface => (
                       <div key={iface.name} className="flex items-center space-x-2">
@@ -207,7 +209,7 @@ export function EnhancedNetworkingView() {
                     checked={stpEnabled}
                     onChange={(e) => setStpEnabled(e.target.checked)}
                   />
-                  <Label htmlFor="stp-enabled">Enable Spanning Tree Protocol (STP)</Label>
+                  <Label htmlFor="stp-enabled">{t('networking.enableStp')}</Label>
                 </div>
               </div>
               <div className="flex justify-end gap-2 pt-4">
@@ -262,7 +264,7 @@ export function EnhancedNetworkingView() {
                     })
                   }
                 }}>
-                  Create Bridge
+                  {t('common.create')} {t('networking.bridge')}
                 </Button>
               </div>
             </DialogContent>
@@ -272,12 +274,12 @@ export function EnhancedNetworkingView() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Network
+                {t('networking.createNetwork')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px]">
               <DialogHeader>
-                <DialogTitle>Create Virtual Network</DialogTitle>
+                <DialogTitle>{t('networking.createNetwork')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -439,10 +441,10 @@ export function EnhancedNetworkingView() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className={SPACING.section}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="physical">Physical</TabsTrigger>
-          <TabsTrigger value="virtual">Virtual</TabsTrigger>
-          <TabsTrigger value="bridges">Bridges</TabsTrigger>
+          <TabsTrigger value="overview">{t('networking.overview')}</TabsTrigger>
+          <TabsTrigger value="physical">{t('networking.physical')}</TabsTrigger>
+          <TabsTrigger value="virtual">{t('networking.virtual')}</TabsTrigger>
+          <TabsTrigger value="bridges">{t('networking.bridges')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className={SPACING.section}>
@@ -452,7 +454,7 @@ export function EnhancedNetworkingView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Total Interfaces</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('networking.totalInterfaces')}</p>
                     <p className="text-2xl font-bold">{systemInterfaces.length}</p>
                   </div>
                   <Network className="h-8 w-8 text-muted-foreground" />
@@ -464,7 +466,7 @@ export function EnhancedNetworkingView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Active Interfaces</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('networking.activeInterfaces')}</p>
                     <p className="text-2xl font-bold text-green-600">
                       {systemInterfaces.filter(i => i.state === 'up').length}
                     </p>
@@ -478,7 +480,7 @@ export function EnhancedNetworkingView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Bridge Interfaces</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('networking.bridgeInterfaces')}</p>
                     <p className="text-2xl font-bold">{bridgeInterfaces.length}</p>
                   </div>
                   <Router className="h-8 w-8 text-muted-foreground" />
@@ -490,7 +492,7 @@ export function EnhancedNetworkingView() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Virtual Networks</p>
+                    <p className="text-sm font-medium text-muted-foreground">{t('networking.virtualNetworks')}</p>
                     <p className="text-2xl font-bold">{virtualNetworks.length}</p>
                   </div>
                   <Wifi className="h-8 w-8 text-muted-foreground" />
@@ -502,18 +504,18 @@ export function EnhancedNetworkingView() {
           {/* All Interfaces Table */}
           <Card>
             <CardHeader>
-              <CardTitle>System Network Interfaces</CardTitle>
+              <CardTitle>{t('networking.systemNetworkInterfaces')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Interface</TableHead>
-                    <TableHead className="px-4">Type</TableHead>
-                    <TableHead className="px-4">Status</TableHead>
-                    <TableHead className="px-4">IP Address</TableHead>
-                    <TableHead className="px-4">Speed</TableHead>
-                    <TableHead className="px-4">RX/TX</TableHead>
+                    <TableHead className="px-4">{t('networking.interface')}</TableHead>
+                    <TableHead className="px-4">{t('networking.type')}</TableHead>
+                    <TableHead className="px-4">{t('networking.status')}</TableHead>
+                    <TableHead className="px-4">{t('networking.ipAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.speed')}</TableHead>
+                    <TableHead className="px-4">{t('networking.rxTx')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -550,19 +552,19 @@ export function EnhancedNetworkingView() {
         <TabsContent value="physical" className={SPACING.section}>
           <Card>
             <CardHeader>
-              <CardTitle>Physical Network Interfaces</CardTitle>
+              <CardTitle>{t('networking.physicalNetworkInterfaces')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Interface</TableHead>
-                    <TableHead className="px-4">Status</TableHead>
-                    <TableHead className="px-4">IP Address</TableHead>
-                    <TableHead className="px-4">MAC Address</TableHead>
-                    <TableHead className="px-4">Speed</TableHead>
-                    <TableHead className="px-4">MTU</TableHead>
-                    <TableHead className="px-4">Traffic</TableHead>
+                    <TableHead className="px-4">{t('networking.interface')}</TableHead>
+                    <TableHead className="px-4">{t('networking.status')}</TableHead>
+                    <TableHead className="px-4">{t('networking.ipAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.macAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.speed')}</TableHead>
+                    <TableHead className="px-4">{t('networking.mtu')}</TableHead>
+                    <TableHead className="px-4">{t('networking.traffic')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -598,17 +600,17 @@ export function EnhancedNetworkingView() {
         <TabsContent value="virtual" className={SPACING.section}>
           <Card>
             <CardHeader>
-              <CardTitle>Virtual Network Interfaces</CardTitle>
+              <CardTitle>{t('networking.virtualNetworkInterfaces')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Interface</TableHead>
-                    <TableHead className="px-4">Type</TableHead>
-                    <TableHead className="px-4">Status</TableHead>
-                    <TableHead className="px-4">MAC Address</TableHead>
-                    <TableHead className="px-4">Traffic</TableHead>
+                    <TableHead className="px-4">{t('networking.interface')}</TableHead>
+                    <TableHead className="px-4">{t('networking.type')}</TableHead>
+                    <TableHead className="px-4">{t('networking.status')}</TableHead>
+                    <TableHead className="px-4">{t('networking.macAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.traffic')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -640,18 +642,18 @@ export function EnhancedNetworkingView() {
         <TabsContent value="bridges" className={SPACING.section}>
           <Card>
             <CardHeader>
-              <CardTitle>Bridge Interfaces</CardTitle>
+              <CardTitle>{t('networking.bridgeNetworkInterfaces')}</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Bridge</TableHead>
-                    <TableHead className="px-4">Status</TableHead>
-                    <TableHead className="px-4">IP Address</TableHead>
-                    <TableHead className="px-4">MAC Address</TableHead>
-                    <TableHead className="px-4">Traffic</TableHead>
-                    <TableHead className="px-4">Actions</TableHead>
+                    <TableHead className="px-4">{t('networking.bridge')}</TableHead>
+                    <TableHead className="px-4">{t('networking.status')}</TableHead>
+                    <TableHead className="px-4">{t('networking.ipAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.macAddress')}</TableHead>
+                    <TableHead className="px-4">{t('networking.traffic')}</TableHead>
+                    <TableHead className="px-4">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

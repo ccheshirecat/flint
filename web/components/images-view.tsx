@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -47,6 +48,7 @@ import { ConsistentButton } from "@/components/ui/consistent-button"
 import { ErrorState } from "@/components/ui/error-state"
 
 export function ImagesView() {
+  const { t } = useTranslation()
   const [images, setImages] = useState<Image[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -104,28 +106,28 @@ export function ImagesView() {
         return (
           <Badge className="bg-primary text-primary-foreground">
             <CheckCircle className="mr-1 h-3 w-3" />
-            Available
+            {t('images.available')}
           </Badge>
         )
       case "uploading":
         return (
           <Badge className="bg-accent text-accent-foreground">
             <Upload className="mr-1 h-3 w-3" />
-            Uploading
+            {t('images.uploading')}
           </Badge>
         )
       case "downloading":
         return (
           <Badge className="bg-accent text-accent-foreground">
             <Download className="mr-1 h-3 w-3" />
-            Downloading
+            {t('images.downloading')}
           </Badge>
         )
       case "error":
         return (
           <Badge variant="destructive">
             <XCircle className="mr-1 h-3 w-3" />
-            Error
+            {t('images.error')}
           </Badge>
         )
       default:
@@ -178,7 +180,7 @@ export function ImagesView() {
   }
 
   const handleDeleteImage = async (imageId: string) => {
-    if (!confirm("Are you sure you want to delete this image? This action cannot be undone.")) {
+    if (!confirm(t('images.confirmDeleteGeneric'))) {
       return
     }
     
@@ -197,13 +199,13 @@ export function ImagesView() {
   }
 
   if (isLoading) {
-    return <LoadingState title="Loading images" description="Please wait while we fetch your image library" />
+    return <LoadingState title={t('images.loadingImages')} description={t('images.loadingImagesDesc')} />
   }
 
   if (error) {
     return (
       <ErrorState 
-        title="Error Loading Images"
+        title={t('images.errorLoadingImages')}
         description={error}
       />
     )
@@ -214,31 +216,31 @@ export function ImagesView() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h2 className={TYPOGRAPHY.sectionTitle}>My Images</h2>
-          <p className="text-muted-foreground">Manage your uploaded images and templates</p>
+          <h2 className={TYPOGRAPHY.sectionTitle}>{t('images.myImages')}</h2>
+          <p className="text-muted-foreground">{t('images.manageImagesDesc')}</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <ConsistentButton icon={<Plus className="h-4 w-4" />}>
-              Add Image
+              {t('images.addImage')}
             </ConsistentButton>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Add New Image</DialogTitle>
+              <DialogTitle>{t('images.addNewImage')}</DialogTitle>
               <DialogDescription>
-                Import an existing image or upload a new one to your library.
+                {t('images.importExistingImage')}
               </DialogDescription>
             </DialogHeader>
             <Tabs defaultValue="upload" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="upload">Upload File</TabsTrigger>
-                <TabsTrigger value="import">Import from Host</TabsTrigger>
-                <TabsTrigger value="download">Download URL</TabsTrigger>
+                <TabsTrigger value="upload">{t('images.uploadFile')}</TabsTrigger>
+                <TabsTrigger value="import">{t('images.importFromHost')}</TabsTrigger>
+                <TabsTrigger value="download">{t('images.downloadURL')}</TabsTrigger>
               </TabsList>
               <TabsContent value="upload" className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Select File</label>
+                  <label className="text-sm font-medium">{t('images.selectFile')}</label>
                   <Input
                     type="file"
                     accept=".iso,.qcow2,.img"
@@ -251,7 +253,7 @@ export function ImagesView() {
                   {isUploading && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-sm">
-                        <span>Uploading...</span>
+                        <span>{t('images.uploading')}...</span>
                         <span>{uploadProgress}%</span>
                       </div>
                       <Progress value={uploadProgress} />
@@ -261,15 +263,15 @@ export function ImagesView() {
               </TabsContent>
               <TabsContent value="import" className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Host Path</label>
+                  <label className="text-sm font-medium">{t('images.hostPath')}</label>
                   <Input
-                    placeholder="/path/to/image.iso"
+                    placeholder={t('images.hostPathPlaceholder')}
                     value={importPath}
                     onChange={(e) => setImportPath(e.target.value)}
                     disabled={isImporting}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter the absolute path to an image file on the host system.
+                    {t('images.hostPathDesc')}
                   </p>
                 </div>
                 <Button
@@ -295,24 +297,24 @@ export function ImagesView() {
                   {isImporting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Importing...
+                      {t('images.importing')}
                     </>
                   ) : (
-                    "Import Image"
+                    t('images.importImage')
                   )}
                 </Button>
               </TabsContent>
               <TabsContent value="download" className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Download URL</label>
+                  <label className="text-sm font-medium">{t('images.downloadURL')}</label>
                   <Input
-                    placeholder="https://example.com/image.iso"
+                    placeholder={t('images.downloadURLPlaceholder')}
                     value={downloadUrl}
                     onChange={(e) => setDownloadUrl(e.target.value)}
                     disabled={isDownloading}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter a URL to download an image file from.
+                    {t('images.downloadURLDesc')}
                   </p>
                 </div>
                 <Button
@@ -338,10 +340,10 @@ export function ImagesView() {
                   {isDownloading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Downloading...
+                      {t('images.downloading')}...
                     </>
                   ) : (
-                    "Download Image"
+                    t('images.downloadImage')
                   )}
                 </Button>
               </TabsContent>
@@ -358,7 +360,7 @@ export function ImagesView() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search images by name or OS..."
+                  placeholder={t('images.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -370,9 +372,9 @@ export function ImagesView() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="iso">ISOs</SelectItem>
-                  <SelectItem value="template">Templates</SelectItem>
+                  <SelectItem value="all">{t('images.allTypes')}</SelectItem>
+                  <SelectItem value="iso">{t('images.isos')}</SelectItem>
+                  <SelectItem value="template">{t('images.templates')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -395,15 +397,15 @@ export function ImagesView() {
       ) : (
         <div className="mt-2">
           <EmptyState
-            title="No Images Found"
-            description={searchQuery ? "No images match your search criteria" : "Get started by adding your first image"}
+            title={t('images.noImagesFound')}
+            description={searchQuery ? t('images.noImagesMatch') : t('images.getStartedAddImage')}
             icon={<ImageIcon className="h-8 w-8 text-muted-foreground" />}
             action={
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
                   <Button>
                     <Plus className="mr-2 h-4 w-4" />
-                    Add Image
+                    {t('images.addImage')}
                   </Button>
                 </DialogTrigger>
                 {/* Dialog content is already defined above */}

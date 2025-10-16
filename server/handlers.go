@@ -1036,6 +1036,28 @@ func (s *Server) handleUpdateVolume() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleDeleteVolume() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		poolName := chi.URLParam(r, "poolName")
+		volumeName := chi.URLParam(r, "volumeName")
+
+		if poolName == "" || volumeName == "" {
+			http.Error(w, `{"error": "Pool name and volume name are required"}`, http.StatusBadRequest)
+			return
+		}
+
+		err := s.client.DeleteVolume(poolName, volumeName)
+		if err != nil {
+			http.Error(w, fmt.Sprintf(`{"error": "Failed to delete volume: %s"}`, err.Error()), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{"status": "success"})
+	}
+}
+
 func (s *Server) handleCreateNetwork() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req struct {

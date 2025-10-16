@@ -2,6 +2,7 @@ import type React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/components/i18n-provider"
 
 interface ResourceCardProps {
   title: string
@@ -26,6 +27,7 @@ export function ResourceCard({
   className,
   children,
 }: ResourceCardProps) {
+  const { t } = useTranslation()
   return (
     <Card
       className={cn(
@@ -52,7 +54,7 @@ export function ResourceCard({
                 percentage > 80 ? "[&>div]:bg-destructive" : percentage > 60 ? "[&>div]:bg-accent" : "[&>div]:bg-primary"
               )}
             />
-            <p className="text-xs text-muted-foreground font-medium">{Math.round(percentage)}% used</p>
+            <p className="text-xs text-muted-foreground font-medium">{Math.round(percentage)}% {t('vm.used')}</p>
           </div>
         )}
         {trend && trendValue && (

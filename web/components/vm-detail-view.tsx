@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { navigateTo, routes, getUrlParams } from "@/lib/navigation"
 import { useToast } from "@/hooks/use-toast"
 import dynamic from "next/dynamic"
 
 
 // Lazy load the serial console component to reduce initial bundle size
-const VMSerialConsole = dynamic(() => import("@/components/vm-serial-console").then(mod => ({ default: mod.VMSerialConsole })), {
+const VMSerialConsole = dynamic(() => import("@/components/vm-serial-console").then(mod => mod.VMSerialConsole), {
   loading: () => (
     <div className="flex items-center justify-center h-96">
       <div className="flex items-center gap-2">
@@ -74,7 +75,8 @@ const formatUptime = (seconds: number) => {
   }
 };
 
-export function VMDetailView() {
+export default function VMDetailView() {
+  const { t } = useTranslation()
   const searchParams = getUrlParams()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("overview")
@@ -419,15 +421,15 @@ export function VMDetailView() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Error Loading VM</h2>
-          <p className="text-muted-foreground">{error || "VM not found"}</p>
+          <h2 className="text-xl font-semibold mb-2">{t('vm.errorLoadingVM')}</h2>
+          <p className="text-muted-foreground">{error || t('vm.vmNotFound')}</p>
           <Button
             variant="outline"
             className="mt-4"
             onClick={() => navigateTo(routes.vms)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to VMs
+            {t('vm.backToVMs')}
           </Button>
         </div>
       </div>
@@ -442,21 +444,21 @@ export function VMDetailView() {
         return (
           <Badge className="bg-green-500 hover:bg-green-600 text-white">
             <Activity className="mr-1 h-3 w-3" />
-            Running
+            {t('vm.running')}
           </Badge>
         )
       case "shutoff":
         return (
           <Badge className="bg-red-500 hover:bg-red-600 text-white">
             <Square className="mr-1 h-3 w-3" />
-            Stopped
+            {t('vm.stopped')}
           </Badge>
         )
       case "paused":
         return (
           <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">
             <Clock className="mr-1 h-3 w-3" />
-            Paused
+            {t('vm.paused')}
           </Badge>
         )
       default:
@@ -518,7 +520,7 @@ export function VMDetailView() {
             onClick={() => navigateTo(routes.vms)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to VMs
+            {t('vm.backToVMs')}
           </Button>
           <div>
             <div className="flex items-center gap-3">
@@ -544,7 +546,7 @@ export function VMDetailView() {
                 ) : (
                   <Square className="mr-2 h-4 w-4" />
                 )}
-                Stop
+                {t('vm.stop')}
               </Button>
               <Button
                 variant="outline"
@@ -558,7 +560,7 @@ export function VMDetailView() {
                 ) : (
                   <RotateCcw className="mr-2 h-4 w-4" />
                 )}
-                Reboot
+                {t('vm.restart')}
               </Button>
             </>
           ) : (
@@ -574,7 +576,7 @@ export function VMDetailView() {
               ) : (
                 <Play className="mr-2 h-4 w-4" />
               )}
-              Start
+              {t('vm.start')}
             </Button>
           )}
           <Button
@@ -588,8 +590,8 @@ export function VMDetailView() {
                     navigateTo(routes.vmConsole(vmData.uuid))
                   } else {
                     toast({
-                      title: "Console Not Available",
-                      description: "Serial console is not available for this VM. Make sure the VM is running.",
+                      title: t('vm.consoleNotAvailable'),
+                      description: t('vm.consoleNotAvailableDesc'),
                       variant: "destructive",
                     })
                   }
@@ -605,7 +607,7 @@ export function VMDetailView() {
             aria-label={`Open serial console for ${vmData.name}`}
           >
             <Monitor className="mr-2 h-4 w-4" />
-            Serial Console
+            {t('vm.serialConsole')}
           </Button>
           {vmData.ip_addresses && vmData.ip_addresses.length > 0 && (
             <Button
@@ -654,7 +656,7 @@ export function VMDetailView() {
             }}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            {t('vm.delete')}
           </Button>
         </div>
       </div>
@@ -662,11 +664,11 @@ export function VMDetailView() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5 mt-2">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="storage">Storage</TabsTrigger>
-          <TabsTrigger value="networking">Networking</TabsTrigger>
-          <TabsTrigger value="console">Console</TabsTrigger>
-          <TabsTrigger value="snapshots">Snapshots</TabsTrigger>
+          <TabsTrigger value="overview">{t('vm.overview')}</TabsTrigger>
+          <TabsTrigger value="storage">{t('vm.storage')}</TabsTrigger>
+          <TabsTrigger value="networking">{t('vm.networking')}</TabsTrigger>
+          <TabsTrigger value="console">{t('vm.console')}</TabsTrigger>
+          <TabsTrigger value="snapshots">{t('vm.snapshots')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-4">
@@ -675,36 +677,36 @@ export function VMDetailView() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle>
-                  Configuration
+                  {t('vm.configuration')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pb-4">
                  <div className="grid grid-cols-2 gap-4">
                    <div>
-                     <p className="text-sm font-medium text-muted-foreground">vCPUs</p>
-                     <p className="text-lg font-semibold">{vmData.vcpus}</p>
+                     <p className="text-sm font-medium text-muted-foreground">{t('vm.cpu_cores')}</p>
+                     <p className="text-lg font-bold">{vmData.vcpus}</p>
                    </div>
                    <div>
-                     <p className="text-sm font-medium text-muted-foreground">Memory</p>
+                     <p className="text-sm font-medium text-muted-foreground">{t('vm.memory')}</p>
                      <p className="text-lg font-semibold">{formatMemory(vmData.memory_kb)}</p>
                    </div>
                    <div>
-                     <p className="text-sm font-medium text-muted-foreground">Operating System</p>
+                     <p className="text-sm font-medium text-muted-foreground">{t('vm.operatingSystem')}</p>
                      <p className="text-lg font-semibold">{vmData.os_info || vmData.os || "Unknown"}</p>
                    </div>
                    <div>
-                     <p className="text-sm font-medium text-muted-foreground">State</p>
+                     <p className="text-sm font-medium text-muted-foreground">{t('vm.state')}</p>
                      <div className="mt-1">{getStatusBadge(vmData.state)}</div>
                    </div>
                  </div>
                 <Separator />
                  <div className="space-y-2">
                    <div className="flex justify-between text-sm">
-                     <span className="text-muted-foreground">Uptime</span>
+                     <span className="text-muted-foreground">{t('vm.uptime')}</span>
                      <span>{formatUptime(vmData.uptime_sec)}</span>
                    </div>
                    <div className="flex justify-between text-sm">
-                     <span className="text-muted-foreground">CPU Usage</span>
+                     <span className="text-muted-foreground">{t('common.cpuUsage')}</span>
                      <span>{vmData.cpu_percent ? vmData.cpu_percent.toFixed(1) : 0}%</span>
                    </div>
                  </div>
@@ -714,19 +716,19 @@ export function VMDetailView() {
             {/* Current Usage */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle>Current Usage</CardTitle>
+                <CardTitle>{t('vm.currentUsage')}</CardTitle>
               </CardHeader>
                <CardContent className="space-y-4 pb-4">
                  <div className="space-y-2">
                    <div className="flex justify-between text-sm">
-                     <span className="text-muted-foreground">CPU Usage</span>
+                     <span className="text-muted-foreground">{t('common.cpuUsage')}</span>
                      <span className="font-medium">{vmData.cpu_percent ? vmData.cpu_percent.toFixed(1) : 0}%</span>
                    </div>
                    <Progress value={vmData.cpu_percent} className="h-2" />
                  </div>
                  <div className="space-y-2">
                    <div className="flex justify-between text-sm">
-                     <span className="text-muted-foreground">Memory</span>
+                     <span className="text-muted-foreground">{t('vm.memory')}</span>
                      <span className="font-medium">{formatMemory(vmData.memory_kb)}</span>
                    </div>
                     <Progress value={memoryUsagePercent} className="h-2" />
@@ -735,11 +737,11 @@ export function VMDetailView() {
                  <div className="grid grid-cols-2 gap-4 text-center">
                    <div>
                      <p className="text-2xl font-bold text-primary">{vmData.cpu_percent ? vmData.cpu_percent.toFixed(1) : 0}%</p>
-                     <p className="text-xs text-muted-foreground">CPU Load</p>
+                     <p className="text-xs text-muted-foreground">{t('vm.cpuLoad')}</p>
                    </div>
                    <div>
-                     <p className="text-2xl font-bold text-accent">{vmData.vcpus}</p>
-                     <p className="text-xs text-muted-foreground">vCPUs</p>
+                     <p className="text-2xl font-bold text-primary">{vmData.vcpus}</p>
+                     <p className="text-xs text-muted-foreground">{t('vm.cpu_cores')}</p>
                    </div>
                  </div>
                 </CardContent>
@@ -753,25 +755,25 @@ export function VMDetailView() {
           <Card>
             <CardHeader className="pb-3">
                <CardTitle className="flex items-center justify-between">
-                 Storage Devices
+                 {t('vm.storageDevices')}
                  <Dialog open={isAddDiskOpen} onOpenChange={setIsAddDiskOpen}>
                    <DialogTrigger asChild>
                      <Button size="sm">
                        <Plus className="mr-2 h-4 w-4" />
-                       Add Disk
+                       {t('vm.addDisk')}
                      </Button>
                    </DialogTrigger>
                    <DialogContent className="sm:max-w-[425px]">
                      <DialogHeader>
-                       <DialogTitle>Add Disk to VM</DialogTitle>
+                       <DialogTitle>{t('vm.addDiskToVM')}</DialogTitle>
                        <DialogDescription>
-                         Attach a storage volume to this virtual machine.
+                         {t('vm.attachStorageVolume')}
                        </DialogDescription>
                      </DialogHeader>
                      <div className="grid gap-4 py-4">
                        <div className="grid grid-cols-4 items-center gap-4">
                          <Label htmlFor="volume-path" className="text-right">
-                           Volume Path
+                           {t('vm.volumePath')}
                          </Label>
                          <Input
                            id="volume-path"
@@ -783,7 +785,7 @@ export function VMDetailView() {
                        </div>
                        <div className="grid grid-cols-4 items-center gap-4">
                          <Label htmlFor="target-dev" className="text-right">
-                           Target Device
+                           {t('vm.targetDevice')}
                          </Label>
                          <Input
                            id="target-dev"
@@ -803,10 +805,10 @@ export function VMDetailView() {
                          {isAttachingDisk ? (
                            <>
                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                             Attaching...
+                             {t('vm.attaching')}
                            </>
                          ) : (
-                           "Attach Disk"
+                           t('vm.attachDisk')
                          )}
                        </Button>
                      </DialogFooter>
@@ -818,12 +820,12 @@ export function VMDetailView() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Device</TableHead>
-                    <TableHead className="px-4">Type</TableHead>
-                    <TableHead className="px-4">Size</TableHead>
-                    <TableHead className="px-4">Used</TableHead>
-                    <TableHead className="px-4">Format</TableHead>
-                    <TableHead className="px-4">Pool</TableHead>
+                    <TableHead className="px-4">{t('vm.device')}</TableHead>
+                    <TableHead className="px-4">{t('common.type')}</TableHead>
+                    <TableHead className="px-4">{t('common.size')}</TableHead>
+                    <TableHead className="px-4">{t('vm.used')}</TableHead>
+                    <TableHead className="px-4">{t('vm.format')}</TableHead>
+                    <TableHead className="px-4">{t('vm.storagePool')}</TableHead>
                     <TableHead className="px-4"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -831,7 +833,7 @@ export function VMDetailView() {
                   {(vmData.disks || []).map((device, index) => (
                      <TableRow key={index} className="hover:bg-muted/50">
                        <TableCell className="font-mono px-4">{device.device}</TableCell>
-                       <TableCell className="px-4">Disk</TableCell>
+                       <TableCell className="px-4">{t('vm.disk')}</TableCell>
                        <TableCell className="px-4">N/A</TableCell>
                        <TableCell className="px-4">N/A</TableCell>
                        <TableCell className="px-4">N/A</TableCell>
@@ -843,8 +845,8 @@ export function VMDetailView() {
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           onClick={() => {
                             toast({
-                              title: "Feature Not Available",
-                              description: "Disk removal functionality will be available in a future update.",
+                              title: t('vm.featureNotAvailable'),
+                              description: t('vm.diskRemovalFuture'),
                               variant: "default",
                             })
                           }}
@@ -864,13 +866,13 @@ export function VMDetailView() {
           <Card>
             <CardHeader className="pb-3">
                <CardTitle className="flex items-center justify-between">
-                 Network Interfaces
+                 {t('vm.networkInterfaces')}
                  <Button 
                    size="sm"
                    onClick={() => setIsAddNetworkOpen(true)}
                  >
                    <Plus className="mr-2 h-4 w-4" />
-                   Add Interface
+                   {t('vm.addNetworkInterface')}
                  </Button>
                </CardTitle>
             </CardHeader>
@@ -878,12 +880,12 @@ export function VMDetailView() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Interface</TableHead>
-                    <TableHead className="px-4">Type</TableHead>
-                    <TableHead className="px-4">Network</TableHead>
-                    <TableHead className="px-4">MAC Address</TableHead>
-                    <TableHead className="px-4">IP Address</TableHead>
-                    <TableHead className="px-4">Status</TableHead>
+                    <TableHead className="px-4">{t('networking.interface')}</TableHead>
+                    <TableHead className="px-4">{t('common.type')}</TableHead>
+                    <TableHead className="px-4">{t('vm.network')}</TableHead>
+                    <TableHead className="px-4">{t('vm.macAddress')}</TableHead>
+                    <TableHead className="px-4">{t('vm.ipAddress')}</TableHead>
+                    <TableHead className="px-4">{t('common.status')}</TableHead>
                     <TableHead className="px-4"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -896,7 +898,7 @@ export function VMDetailView() {
                        <TableCell className="font-mono px-4">{iface.mac}</TableCell>
                        <TableCell className="font-mono px-4">N/A</TableCell>
                        <TableCell className="px-4">
-                         <Badge className="bg-green-500 hover:bg-green-600 text-white">active</Badge>
+                         <Badge className="bg-green-500 hover:bg-green-600 text-white">{t('vm.active')}</Badge>
                        </TableCell>
                       <TableCell className="px-4">
                         <Button 
@@ -905,8 +907,8 @@ export function VMDetailView() {
                           className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           onClick={() => {
                             toast({
-                              title: "Feature Not Available",
-                              description: "Network interface removal functionality will be available in a future update.",
+                              title: t('vm.featureNotAvailable'),
+                              description: t('vm.diskRemovalFuture'),
                               variant: "default",
                             })
                           }}
@@ -930,25 +932,25 @@ export function VMDetailView() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center justify-between">
-                VM Snapshots
+                {t('vm.vmSnapshots')}
                 <Button
                   size="sm"
                   onClick={() => setIsCreateSnapshotOpen(true)}
                   disabled={vmData.state !== "shutoff"}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Snapshot
+                  {t('vm.createSnapshot')}
                 </Button>
               </CardTitle>
               <CardDescription>
-                Create and manage snapshots of your virtual machine
+                {t('vm.createSnapshotDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="pb-4">
               {vmData.state !== "shutoff" && (
                 <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
                   <p className="text-sm text-yellow-800">
-                    ⚠️ Snapshots can only be created when the VM is stopped. Current state: {vmData.state}
+                    ⚠️ 只有在虚拟机停止时才能创建快照。当前状态：{vmData.state}
                   </p>
                 </div>
               )}
@@ -956,17 +958,17 @@ export function VMDetailView() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="px-4">Name</TableHead>
-                    <TableHead className="px-4">Description</TableHead>
-                    <TableHead className="px-4">Created</TableHead>
-                    <TableHead className="px-4 w-24">Actions</TableHead>
+                    <TableHead className="px-4">{t('common.name')}</TableHead>
+                    <TableHead className="px-4">{t('common.description')}</TableHead>
+                    <TableHead className="px-4">{t('vm.createdAt')}</TableHead>
+                    <TableHead className="px-4 w-24">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {snapshots.map((snapshot) => (
                     <TableRow key={snapshot.name} className="hover:bg-muted/50">
                       <TableCell className="font-medium px-4">{snapshot.name}</TableCell>
-                      <TableCell className="px-4">{snapshot.description || "No description"}</TableCell>
+                      <TableCell className="px-4">{snapshot.description || t('common.noDescription')}</TableCell>
                       <TableCell className="text-sm text-muted-foreground px-4">
                         {new Date(snapshot.created_at).toLocaleString()}
                       </TableCell>
@@ -977,7 +979,7 @@ export function VMDetailView() {
                             size="sm"
                             onClick={() => handleRevertSnapshot(snapshot.name)}
                             disabled={vmData.state !== "shutoff"}
-                            title={vmData.state !== "shutoff" ? "VM must be stopped to revert" : "Revert to this snapshot"}
+                            title={vmData.state !== "shutoff" ? "虚拟机必须停止才能恢复" : "恢复到此快照"}
                           >
                             <RotateCcw className="h-4 w-4" />
                           </Button>
@@ -986,7 +988,7 @@ export function VMDetailView() {
                             size="sm"
                             onClick={() => handleDeleteSnapshot(snapshot.name)}
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                            title="Delete snapshot"
+                            title={t('vm.deleteSnapshot')}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -1000,8 +1002,8 @@ export function VMDetailView() {
               {snapshots.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <Camera className="mx-auto h-12 w-12 mb-4 opacity-50" />
-                  <p>No snapshots found</p>
-                  <p className="text-sm">Create your first snapshot to save the current state</p>
+                  <p>未找到快照</p>
+                  <p className="text-sm">创建您的第一个快照以保存当前状态</p>
                 </div>
               )}
             </CardContent>
@@ -1013,26 +1015,26 @@ export function VMDetailView() {
       <Dialog open={isCreateSnapshotOpen} onOpenChange={setIsCreateSnapshotOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create Snapshot</DialogTitle>
+            <DialogTitle>{t('vm.createSnapshot')}</DialogTitle>
             <DialogDescription>
-              Create a snapshot of the current VM state. The VM must be stopped to create a snapshot.
+              {t('vm.createSnapshotDesc')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="snapshot-name">Snapshot Name *</Label>
+              <Label htmlFor="snapshot-name">{t('vm.snapshotName')} *</Label>
               <Input
                 id="snapshot-name"
-                placeholder="e.g., before-upgrade"
+                placeholder="例如：升级前"
                 value={snapshotName}
                 onChange={(e) => setSnapshotName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="snapshot-description">Description</Label>
+              <Label htmlFor="snapshot-description">{t('vm.snapshotDescription')}</Label>
               <Textarea
                 id="snapshot-description"
-                placeholder="Optional description of this snapshot..."
+                placeholder="可选的快照描述..."
                 value={snapshotDescription}
                 onChange={(e) => setSnapshotDescription(e.target.value)}
                 rows={3}
@@ -1041,7 +1043,7 @@ export function VMDetailView() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateSnapshotOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={handleCreateSnapshot}
@@ -1050,10 +1052,10 @@ export function VMDetailView() {
               {isCreatingSnapshot ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  创建中...
                 </>
               ) : (
-                "Create Snapshot"
+                t('vm.createSnapshot')
               )}
             </Button>
           </DialogFooter>

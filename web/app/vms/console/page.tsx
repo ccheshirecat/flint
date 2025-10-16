@@ -4,6 +4,7 @@ import { PageLayout } from '@/components/shared/page-layout';
 import { getUrlParams, navigateTo, routes } from '@/lib/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from '@/components/i18n-provider';
 
 const VMSerialConsole = dynamic(
   () => import('@/components/vm-serial-console').then(mod => mod.VMSerialConsole),
@@ -11,6 +12,7 @@ const VMSerialConsole = dynamic(
 );
 
 export default function ConsolePage() {
+  const { t } = useTranslation();
   const searchParams = getUrlParams();
   
   const vmUuid = searchParams.get('id'); // ✅ extract vmUuid safely
@@ -18,16 +20,16 @@ export default function ConsolePage() {
   if (!vmUuid) {
     return (
       <PageLayout
-        title="Serial Console"
-        description="VM ID is required to access the console"
+        title={t('vm.serialConsole')}
+        description={t('vm.vmIdRequired')}
       >
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">No VM Selected</h2>
-            <p className="text-muted-foreground mb-4">Please select a VM to access its console</p>
+            <h2 className="text-xl font-semibold mb-2">{t('vm.noVMSelected')}</h2>
+            <p className="text-muted-foreground mb-4">{t('vm.selectVMForConsole')}</p>
             <Button onClick={() => navigateTo('/vms')}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to VMs
+              {t('vm.backToVMs')}
             </Button>
           </div>
         </div>
@@ -37,15 +39,15 @@ export default function ConsolePage() {
 
   return (
     <PageLayout
-      title="Serial Console"
-      description={`Connect to VM ${vmUuid.slice(0, 8)}... serial console for direct access`}
+      title={t('vm.serialConsole')}
+      description={`${t('vm.connectToSerialConsole')} ${vmUuid.slice(0, 8)}...`}
       actions={
         <Button 
           variant="outline" 
           onClick={() => navigateTo(routes.vmDetail(vmUuid))}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to VM Details
+          {t('vm.backToVMDetails')}
         </Button>
       }
     >

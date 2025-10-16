@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { AlertTriangle, CheckCircle, Cpu, MemoryStick, HardDrive, AlertCircle, X } from "lucide-react"
 import { HostResources } from "@/lib/api"
 import { useState } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 
 interface Alert {
   id: string
@@ -19,6 +20,7 @@ interface SystemAlertsProps {
 }
 
 export function SystemAlerts({ alerts, hostResources }: SystemAlertsProps) {
+  const { t } = useTranslation()
   const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set())
 
   const handleDismissAlert = (alertId: string) => {
@@ -35,7 +37,7 @@ export function SystemAlerts({ alerts, hostResources }: SystemAlertsProps) {
     // CPU Usage Alert - simplified without VM data
     if (hostResources.cpu_cores > 0) {
       // For now, just show basic CPU info - VM-based calculation would need VM data prop
-      const cpuInfo = `${hostResources.cpu_cores} CPU cores available`
+      const cpuInfo = `${hostResources.cpu_cores} ${t('vm.cpuCoresAvailable')}`
       resourceAlerts.push({
         id: `cpu-info-${Date.now()}`,
         type: "info",
@@ -181,7 +183,7 @@ export function SystemAlerts({ alerts, hostResources }: SystemAlertsProps) {
       <CardHeader className="pb-2 pt-3">
         <CardTitle className="flex items-center gap-2 text-base">
           <AlertTriangle className="h-4 w-4 text-accent" />
-          System Alerts
+          {t('vm.systemAlerts')}
         </CardTitle>
       </CardHeader>
       <CardContent className="py-1 px-3">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from '@/components/i18n-provider'
 import { navigateTo, routes } from "@/lib/navigation"
 import { SPACING, TYPOGRAPHY, GRIDS, TRANSITIONS } from "@/lib/ui-constants"
 import { ConsistentButton } from "@/components/ui/consistent-button"
@@ -29,7 +30,7 @@ interface Activity {
 }
 
 export function DashboardView() {
-  
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [hostStatus, setHostStatus] = useState<HostStatus | null>(null)
   const [hostResources, setHostResources] = useState<HostResources | null>(null)
@@ -58,7 +59,7 @@ export function DashboardView() {
             const activityData: any[] = await activityResponse.json()
             // Transform to frontend format
             const transformedActivity = activityData.slice(0, 10).map(event => ({
-              action: event.action,
+              action: translateActivityAction(event.action),
               target: event.target,
               time: formatTimestamp(event.timestamp),
               user: "system" // Backend doesn't provide user yet
@@ -122,7 +123,18 @@ export function DashboardView() {
     if (days > 0) return `${days}d ago`
     if (hours > 0) return `${hours}h ago`
     if (minutes > 0) return `${minutes}m ago`
-    return 'Just now'
+    return t('vm.justNow')
+  }
+
+  const translateActivityAction = (action: string) => {
+    switch (action) {
+      case "VM Started":
+        return t('vm.vmStarted')
+      case "VM Stopped":
+        return t('vm.vmStopped')
+      default:
+        return action
+    }
   }
 
   const handleVMAction = async (action: string, vmId: string) => {
@@ -200,15 +212,15 @@ export function DashboardView() {
   }
 
   if (isLoading) {
-    return <LoadingState title="Loading dashboard" description="Please wait while we fetch your data" />
+    return <LoadingState title={t('common.loading')} description={t('common.loadingDescription')} />
   }
 
   if (error || !hostResources || !hostStatus) {
     return (
       <div className={SPACING.section}>
         <ErrorState 
-          title="Error Loading Dashboard"
-          description={error || "Failed to load dashboard data"}
+          title={t('common.error')}
+          description={error || t('common.failedToLoadData')}
         />
       </div>
     )
@@ -219,8 +231,8 @@ export function DashboardView() {
       {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Virtual Machines</h1>
-          <p className="text-muted-foreground">Manage and monitor your virtual machine fleet</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('dashboard.title')}</h1>
+          <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <ConsistentButton 
@@ -230,11 +242,11 @@ export function DashboardView() {
             onClick={() => navigateTo(routes.analytics)}
           >
             <TrendingUp className="h-4 w-4" />
-            <span className="hidden sm:inline">View </span>Analytics
+            {t('vm.viewAnalytics')}
           </ConsistentButton>
           <ConsistentButton onClick={() => navigateTo(routes.vmCreate)} className="bg-primary text-primary-foreground hover:bg-primary/90 hover-fast shadow-md hover:shadow-lg">
             <Plus className="h-4 w-4" />
-            Create VM
+            {t('vm.createVM')}
           </ConsistentButton>
         </div>
       </div>
@@ -246,7 +258,7 @@ export function DashboardView() {
               id: `health-check-${index}-${Date.now()}`,
               type: check.type as "warning" | "info" | "error",
               message: check.message,
-              time: "Just now",
+              time: t('vm.justNow'),
               priority: check.type === "error" ? 1 : check.type === "warning" ? 2 : 3,
               category: "system"
             }))} 
@@ -259,62 +271,62 @@ export function DashboardView() {
         {/* Left Column - Host Resources & VM Stats */}
         <div className="space-y-6 lg:col-span-2">
           <div>
-            <h2 className="text-xl font-semibold mb-6">Host Resources</h2>
+            <h2 className="text-xl font-semibold mb-6">{t('dashboard.hostResources')}</h2>
             <div className={`${GRIDS.fourCol} ${SPACING.gridCompact}`}>
                <ResourceCard
-                 title="CPU Usage"
+                 title={t('common.cpuUsage')}
                  value="0%"
                  percentage={0}
                  icon={<Cpu className="h-4 w-4" />}
                >
                  <p className="text-xs text-muted-foreground mt-1">
-                   {hostResources?.cpu_cores || 0} cores
+                   {hostResources?.cpu_cores || 0} {t('vm.cores')}
                  </p>
                </ResourceCard>
 
               <ResourceCard
-                title="Memory"
+                title={t('common.memory')}
                 value={`${formatMemory((hostResources?.total_memory_kb || 0) - (hostResources?.free_memory_kb || 0))}GB`}
                 percentage={hostResources?.total_memory_kb && hostResources?.free_memory_kb ? ((hostResources.total_memory_kb - hostResources.free_memory_kb) / hostResources.total_memory_kb * 100) : 0}
                 icon={<MemoryStick className="h-4 w-4" />}
               >
-                <p className="text-xs text-muted-foreground mt-1">{formatMemory(hostResources?.free_memory_kb || 0)}GB available</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatMemory(hostResources?.free_memory_kb || 0)}GB {t('vm.available')}</p>
               </ResourceCard>
 
                <ResourceCard
-                 title="Storage"
+                 title={t('common.storage')}
                  value={`${formatStorage(hostResources.storage_used_b || 0)}GB`}
                  percentage={hostResources.storage_total_b ? (hostResources.storage_used_b / hostResources.storage_total_b) * 100 : 0}
                  icon={<HardDrive className="h-4 w-4" />}
                >
-                 <p className="text-xs text-muted-foreground mt-1">{formatStorage(hostResources.storage_total_b || 0)}GB total</p>
+                 <p className="text-xs text-muted-foreground mt-1">{formatStorage(hostResources.storage_total_b || 0)}GB {t('vm.total')}</p>
                </ResourceCard>
 
-               <ResourceCard title="Network" value={(hostResources.active_interfaces || 0).toString()} icon={<Network className="h-4 w-4" />}>
-                 <div className="mt-2 text-xs text-muted-foreground">Active interfaces</div>
-                 <p className="text-xs text-muted-foreground mt-1">Network monitoring</p>
+               <ResourceCard title={t('networking.title')} value={(hostResources.active_interfaces || 0).toString()} icon={<Network className="h-4 w-4" />}>
+                 <div className="mt-2 text-xs text-muted-foreground">{t('networking.activeInterfaces')}</div>
+                 <p className="text-xs text-muted-foreground mt-1">{t('vm.networkMonitoring')}</p>
                </ResourceCard>
             </div>
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-6">Virtual Machine Overview</h2>
+            <h2 className="text-xl font-semibold mb-6">{t('dashboard.vmOverview')}</h2>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-4">
-              <ResourceCard title="Total VMs" value={vmStats.total.toString()} icon={<Activity className="h-4 w-4" />} />
+              <ResourceCard title={t('dashboard.totalVMs')} value={vmStats.total.toString()} icon={<Activity className="h-4 w-4" />} />
               <ResourceCard
-                title="Running"
+                title={t('dashboard.running')}
                 value={vmStats.running.toString()}
                 icon={<Play className="h-4 w-4 text-green-500" />}
                 className="text-green-500"
               />
               <ResourceCard 
-                title="Stopped" 
+                title={t('dashboard.stopped')} 
                 value={vmStats.stopped.toString()} 
                 icon={<Square className="h-4 w-4 text-red-500" />} 
                 className="text-red-500"
               />
               <ResourceCard
-                title="Paused"
+                title={t('dashboard.paused')}
                 value={vmStats.paused.toString()}
                 icon={<Clock className="h-4 w-4 text-yellow-500" />}
                 className="text-yellow-500"
@@ -324,14 +336,14 @@ export function DashboardView() {
 
           <div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-6">
-              <h2 className="text-xl font-semibold">Virtual Machines</h2>
+              <h2 className="text-xl font-semibold">{t('vm.virtualMachines')}</h2>
               <ConsistentButton
                 variant="outline"
                 size="sm"
                 className="self-start hover-fast shadow-sm hover:shadow-md border-border/50"
                 onClick={() => navigateTo(routes.vms)}
               >
-                View All
+                {t('dashboard.viewAll')}
               </ConsistentButton>
             </div>
 
@@ -376,13 +388,13 @@ export function DashboardView() {
               </div>
             ) : (
               <EmptyState
-                title="No Virtual Machines"
-                description="Get started by creating your first virtual machine"
+                title={t('dashboard.noVMs')}
+                description={t('dashboard.noVMsDescription')}
                 icon={<Server className="h-8 w-8 text-muted-foreground" />}
                 action={
                   <ConsistentButton onClick={() => navigateTo(routes.vmCreate)}>
                     <Plus className="h-4 w-4" />
-                    Create VM
+                    {t('vm.createVM')}
                   </ConsistentButton>
                 }
               />

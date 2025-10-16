@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { navigateTo, routes } from "@/lib/navigation"
 import { SPACING, TYPOGRAPHY, TRANSITIONS } from "@/lib/ui-constants"
 import { ConsistentButton } from "@/components/ui/consistent-button"
@@ -47,7 +48,7 @@ interface SimpleVMConfig {
 }
 
 export function SimpleVMWizard() {
-  
+  const { t } = useTranslation()
   const { toast } = useToast()
   const [isCreating, setIsCreating] = useState(false)
   const [createdVM, setCreatedVM] = useState<{ uuid: string; name: string } | null>(null)
@@ -139,8 +140,8 @@ export function SimpleVMWizard() {
         if (publicKey) {
           updateConfig({ sshKeys: publicKey })
           toast({
-            title: "SSH Key Detected",
-            description: "Auto-filled your SSH public key for passwordless access",
+            title: t('vm.sshKeyDetected'),
+            description: t('vm.autoFilledSSHKey'),
           })
         }
       }
@@ -157,8 +158,8 @@ export function SimpleVMWizard() {
   const handleCreate = async () => {
     if (!config.name.trim() || !config.selectedSource) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
+        title: t('vm.missingInformation'),
+        description: t('vm.fillInRequiredFields'),
         variant: "destructive",
       })
       return
@@ -203,7 +204,7 @@ export function SimpleVMWizard() {
 
       if (!response.ok) {
         const errData = await response.json()
-        throw new Error(errData.error || 'Failed to create VM')
+        throw new Error(errData.error || t('vm.failedToCreateVM'))
       }
 
       const newVM = await response.json()
@@ -211,14 +212,14 @@ export function SimpleVMWizard() {
       setCreatedVM({ uuid: newVM.uuid, name: config.name })
       
       toast({
-        title: "VM Created Successfully!",
-        description: `${config.name} is booting up. Watch the console below for progress.`,
+        title: t('vm.vmCreatedSuccessfully'),
+        description: `${config.name} ${t('vm.vmBootingUp')}`,
       })
     } catch (error) {
       console.error("VM creation failed:", error)
       toast({
-        title: "Creation Failed",
-        description: error instanceof Error ? error.message : "Failed to create VM",
+        title: t('vm.creationFailed'),
+        description: error instanceof Error ? error.message : t('vm.failedToCreateVM'),
         variant: "destructive",
       })
     } finally {
@@ -233,8 +234,8 @@ export function SimpleVMWizard() {
     setVmIP(ip)
     setSSHReady(true)
     toast({
-      title: "🎉 SSH Ready!",
-      description: `Your VM is ready at ${ip}. Click below to copy the SSH command.`,
+      title: `🎉 ${t('vm.sshReady')}`,
+      description: `${t('vm.vmReadyAtIP')} ${ip}`,
     })
   }
 
@@ -243,8 +244,8 @@ export function SimpleVMWizard() {
     const command = `ssh ubuntu@${vmIP}`
     navigator.clipboard.writeText(command)
     toast({
-      title: "SSH Command Copied!",
-      description: `Copied: ${command}`,
+      title: t('vm.sshCommandCopied'),
+      description: `${t('vm.copied')}: ${command}`,
     })
   }
 
@@ -265,11 +266,11 @@ export function SimpleVMWizard() {
             onClick={() => navigateTo(routes.vms)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to VMs
+            {t('vm.backToVMs')}
           </ConsistentButton>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">VM Created: {createdVM.name}</h1>
-            <p className="text-muted-foreground">Watch your VM boot up and get ready for SSH access</p>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('vm.vmCreated')}: {createdVM.name}</h1>
+            <p className="text-muted-foreground">{t('vm.watchVMBoot')}</p>
           </div>
         </div>
 
@@ -287,25 +288,25 @@ export function SimpleVMWizard() {
           <div className="lg:col-span-1 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Connection Status</CardTitle>
+                <CardTitle>{t('vm.connectionStatus')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {sshReady && vmIP ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="font-medium text-green-700">SSH Ready!</span>
+                      <span className="font-medium text-green-700">{t('vm.sshReady')}!</span>
                     </div>
                     
                     <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm font-medium text-green-800 mb-2">Your VM is ready to use:</p>
+                      <p className="text-sm font-medium text-green-800 mb-2">{t('vm.vmReadyToUse')}:</p>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-green-600">IP Address:</span>
+                          <span className="text-sm text-green-600">{t('vm.ipAddress')}:</span>
                           <code className="text-sm font-mono bg-green-100 px-2 py-1 rounded">{vmIP}</code>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-green-600">Username:</span>
+                          <span className="text-sm text-green-600">{t('vm.username')}:</span>
                           <code className="text-sm font-mono bg-green-100 px-2 py-1 rounded">ubuntu</code>
                         </div>
                       </div>
@@ -314,11 +315,11 @@ export function SimpleVMWizard() {
                     <div className="flex gap-2">
                       <ConsistentButton onClick={copySSHCommand} className="flex-1">
                         <Copy className="mr-2 h-4 w-4" />
-                        Copy SSH Command
+                        {t('vm.copySSHCommand')}
                       </ConsistentButton>
                       <ConsistentButton variant="outline" onClick={goToVMDetail}>
                         <ExternalLink className="mr-2 h-4 w-4" />
-                        VM Details
+                        {t('vm.vmDetails')}
                       </ConsistentButton>
                     </div>
                   </div>
@@ -326,19 +327,18 @@ export function SimpleVMWizard() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-                      <span className="text-muted-foreground">VM is booting...</span>
+                      <span className="text-muted-foreground">{t('vm.vmIsBooting')}...</span>
                     </div>
                     
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-800">
-                        Your VM is starting up. This usually takes 30-60 seconds for cloud images.
-                        Watch the console output for progress.
+                        {t('vm.vmStartingUp')}
                       </p>
                     </div>
 
                     <ConsistentButton variant="outline" onClick={goToVMDetail} className="w-full">
                       <ExternalLink className="mr-2 h-4 w-4" />
-                      Go to VM Details
+                      {t('vm.goToVMDetails')}
                     </ConsistentButton>
                   </div>
                 )}
@@ -347,7 +347,7 @@ export function SimpleVMWizard() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle>{t('vm.quickActions')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <ConsistentButton 
@@ -361,7 +361,7 @@ export function SimpleVMWizard() {
                   }}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Another VM
+                  {t('vm.createAnotherVM')}
                 </ConsistentButton>
                 <ConsistentButton 
                   variant="outline" 
@@ -369,7 +369,7 @@ export function SimpleVMWizard() {
                   onClick={() => navigateTo(routes.vms)}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  View All VMs
+                  {t('vm.viewAllVMs')}
                 </ConsistentButton>
               </CardContent>
             </Card>
@@ -389,11 +389,11 @@ export function SimpleVMWizard() {
           onClick={() => navigateTo(routes.vms)}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to VMs
+          {t('vm.backToVMs')}
         </ConsistentButton>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Create Virtual Machine</h1>
-          <p className="text-muted-foreground">Quick setup for your new VM</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t('vm.createVirtualMachine')}</h1>
+          <p className="text-muted-foreground">{t('vm.quickSetup')}</p>
         </div>
       </div>
 
@@ -402,21 +402,21 @@ export function SimpleVMWizard() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Basic Configuration</CardTitle>
+              <CardTitle>{t('vm.basicConfiguration')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="vm-name">VM Name *</Label>
+                <Label htmlFor="vm-name">{t('vm.vmName')} *</Label>
                 <Input
                   id="vm-name"
-                  placeholder="e.g., web-server-01"
+                  placeholder={t('vm.vmNamePlaceholder')}
                   value={config.name}
                   onChange={(e) => updateConfig({ name: e.target.value })}
                 />
               </div>
 
               <div className="space-y-3">
-                <Label>Installation Source *</Label>
+                <Label>{t('vm.installationSource')} *</Label>
                 <RadioGroup
                   value={config.sourceType}
                   onValueChange={(value) => updateConfig({ 
@@ -435,9 +435,9 @@ export function SimpleVMWizard() {
                       <RadioGroupItem value="cloud" id="cloud" />
                       <div className="flex-1">
                         <Label htmlFor="cloud" className="font-medium cursor-pointer">
-                          Cloud Image
+                          {t('vm.cloudImage')}
                         </Label>
-                        <p className="text-xs text-muted-foreground">Ready-to-use with cloud-init</p>
+                        <p className="text-xs text-muted-foreground">{t('vm.readyToUse')}</p>
                       </div>
                     </div>
 
@@ -450,9 +450,9 @@ export function SimpleVMWizard() {
                       <RadioGroupItem value="iso" id="iso" />
                       <div className="flex-1">
                         <Label htmlFor="iso" className="font-medium cursor-pointer">
-                          ISO Image
+                          {t('vm.isoImage')}
                         </Label>
-                        <p className="text-xs text-muted-foreground">Manual installation</p>
+                        <p className="text-xs text-muted-foreground">{t('vm.manualInstallation')}</p>
                       </div>
                     </div>
                   </div>
@@ -461,7 +461,7 @@ export function SimpleVMWizard() {
 
               {config.sourceType === "cloud" && (
                 <div className="space-y-2">
-                  <Label>Select Cloud Image</Label>
+                  <Label>{t('vm.selectCloudImage')}</Label>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {cloudImages && cloudImages.length > 0 ? (
                       cloudImages.map((image) => (
@@ -477,7 +477,7 @@ export function SimpleVMWizard() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-medium text-sm">{image.name}</p>
-                              <p className="text-xs text-muted-foreground">{image.os_info || "Cloud Image"}</p>
+                              <p className="text-xs text-muted-foreground">{image.os_info || t('vm.cloudImage')}</p>
                             </div>
                             <Badge variant="outline" className="text-xs">{formatSize(image.size_b)}</Badge>
                           </div>
@@ -485,9 +485,9 @@ export function SimpleVMWizard() {
                       ))
                     ) : (
                       <div className="text-center py-4 text-muted-foreground text-sm">
-                        No cloud images available. 
+                        {t('vm.noCloudImagesAvailable')} 
                         <ConsistentButton variant="link" className="p-0 h-auto ml-1" onClick={() => navigateTo(routes.images)}>
-                          Upload images here
+                          {t('vm.uploadImagesHere')}
                         </ConsistentButton>
                       </div>
                     )}
@@ -497,7 +497,7 @@ export function SimpleVMWizard() {
 
               {config.sourceType === "iso" && (
                 <div className="space-y-2">
-                  <Label>Select ISO Image</Label>
+                  <Label>{t('vm.selectISOImage')}</Label>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {isoImages && isoImages.length > 0 ? (
                       isoImages.map((image) => (
@@ -513,7 +513,7 @@ export function SimpleVMWizard() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-medium text-sm">{image.name}</p>
-                              <p className="text-xs text-muted-foreground">{image.os_info || "ISO Image"}</p>
+                              <p className="text-xs text-muted-foreground">{image.os_info || t('vm.isoImage')}</p>
                             </div>
                             <Badge variant="outline" className="text-xs">{formatSize(image.size_b)}</Badge>
                           </div>
@@ -521,7 +521,7 @@ export function SimpleVMWizard() {
                       ))
                     ) : (
                       <div className="text-center py-4 text-muted-foreground text-sm">
-                        No ISO images available
+                        {t('vm.noISOImagesAvailable')}
                       </div>
                     )}
                   </div>
@@ -533,24 +533,24 @@ export function SimpleVMWizard() {
           {config.enableCloudInit && (
             <Card>
               <CardHeader>
-                <CardTitle>Cloud-Init Setup</CardTitle>
+                <CardTitle>{t('vm.cloudInitSetup')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="hostname">Hostname</Label>
+                    <Label htmlFor="hostname">{t('vm.hostname')}</Label>
                     <Input
                       id="hostname"
                       placeholder={config.name || "my-vm"}
                       value={config.hostname || config.name}
                       onChange={(e) => updateConfig({ hostname: e.target.value })}
                     />
-                    <p className="text-xs text-muted-foreground">Auto-filled from VM name</p>
+                    <p className="text-xs text-muted-foreground">{t('vm.autoFilledFromVMName')}</p>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="username">Username</Label>
+                      <Label htmlFor="username">{t('vm.username')}</Label>
                       <Input
                         id="username"
                         placeholder="ubuntu"
@@ -559,11 +559,11 @@ export function SimpleVMWizard() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password">{t('vm.password')}</Label>
                       <Input
                         id="password"
                         type="password"
-                        placeholder="Enter password"
+                        placeholder={t('vm.enterPassword')}
                         value={config.password}
                         onChange={(e) => updateConfig({ password: e.target.value })}
                       />
@@ -571,7 +571,7 @@ export function SimpleVMWizard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="ssh-keys">SSH Public Keys (one per line)</Label>
+                    <Label htmlFor="ssh-keys">{t('vm.sshPublicKeys')}</Label>
                     <textarea
                       id="ssh-keys"
                       className="w-full min-h-[80px] px-3 py-2 text-sm border border-input rounded-md bg-background"
@@ -582,18 +582,18 @@ export function SimpleVMWizard() {
                   </div>
 
                   <div className="space-y-3">
-                    <Label>Network Configuration</Label>
+                    <Label>{t('vm.networkConfiguration')}</Label>
                     <RadioGroup
                       value={config.networkType}
                       onValueChange={(value) => updateConfig({ networkType: value as "dhcp" | "static" })}
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="dhcp" id="dhcp" />
-                        <Label htmlFor="dhcp">DHCP (Automatic)</Label>
+                        <Label htmlFor="dhcp">{t('vm.dhcpAutomatic')}</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="static" id="static" />
-                        <Label htmlFor="static">Static IP</Label>
+                        <Label htmlFor="static">{t('vm.staticIP')}</Label>
                       </div>
                     </RadioGroup>
 
@@ -601,7 +601,7 @@ export function SimpleVMWizard() {
                       <div className="space-y-3 p-3 border rounded-lg bg-muted/20">
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-2">
-                            <Label htmlFor="static-ip">IP Address</Label>
+                            <Label htmlFor="static-ip">{t('vm.ipAddress')}</Label>
                             <Input
                               id="static-ip"
                               placeholder="192.168.1.100"
@@ -610,7 +610,7 @@ export function SimpleVMWizard() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="gateway">Gateway</Label>
+                            <Label htmlFor="gateway">{t('vm.gateway')}</Label>
                             <Input
                               id="gateway"
                               placeholder="192.168.1.1"
@@ -620,7 +620,7 @@ export function SimpleVMWizard() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="dns">DNS Servers (comma-separated)</Label>
+                          <Label htmlFor="dns">{t('vm.dnsServers')}</Label>
                           <Input
                             id="dns"
                             placeholder="8.8.8.8, 1.1.1.1"
@@ -641,13 +641,13 @@ export function SimpleVMWizard() {
         <div className="space-y-6">
           <VMTemplates onLaunchFromTemplate={(templateId, vmName) => {
             toast({
-              title: "Launching from Template", 
-              description: `Creating ${vmName} from template...`,
+              title: t('vm.launchingFromTemplate'), 
+              description: `${t('vm.creating')} ${vmName} ${t('vm.fromTemplate')}...`,
             })
           }} />
           <Card>
             <CardHeader>
-              <CardTitle>Resources</CardTitle>
+              <CardTitle>{t('vm.resources')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -663,7 +663,7 @@ export function SimpleVMWizard() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="memory">Memory (MB)</Label>
+                  <Label htmlFor="memory">{t('vm.memoryMB')}</Label>
                   <Input
                     id="memory"
                     type="number"
@@ -677,7 +677,7 @@ export function SimpleVMWizard() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="disk-size">Disk Size (GB)</Label>
+                <Label htmlFor="disk-size">{t('vm.diskSizeGB')}</Label>
                 <Input
                   id="disk-size"
                   type="number"
@@ -688,7 +688,7 @@ export function SimpleVMWizard() {
               </div>
 
               <div className="space-y-2">
-                <Label>Storage Pool</Label>
+                <Label>{t('vm.storagePool')}</Label>
                 <Select
                   value={config.storagePool}
                   onValueChange={(value) => updateConfig({ storagePool: value })}
@@ -707,7 +707,7 @@ export function SimpleVMWizard() {
               </div>
 
               <div className="space-y-2">
-                <Label>Network</Label>
+                <Label>{t('vm.network')}</Label>
                 <Select
                   value={config.network}
                   onValueChange={(value) => updateConfig({ network: value })}
@@ -734,23 +734,23 @@ export function SimpleVMWizard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Summary</CardTitle>
+              <CardTitle>{t('vm.summary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Name</span>
-                <span className="font-medium">{config.name || "Not set"}</span>
+                <span className="text-muted-foreground">{t('vm.name')}</span>
+                <span className="font-medium">{config.name || t('vm.notSet')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Source</span>
-                <span className="font-medium">{config.selectedSource || "Not selected"}</span>
+                <span className="text-muted-foreground">{t('vm.source')}</span>
+                <span className="font-medium">{config.selectedSource || t('vm.notSelected')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Resources</span>
+                <span className="text-muted-foreground">{t('vm.resources')}</span>
                 <span className="font-medium">{config.vcpus} vCPU, {config.memory/1024}GB RAM</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Storage</span>
+                <span className="text-muted-foreground">{t('vm.storage')}</span>
                 <span className="font-medium">{config.diskSize}GB</span>
               </div>
             </CardContent>
@@ -764,12 +764,12 @@ export function SimpleVMWizard() {
             {isCreating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating VM...
+                {t('vm.creatingVM')}...
               </>
             ) : (
               <>
                 <Zap className="mr-2 h-4 w-4" />
-                Create & Start VM
+                {t('vm.createAndStartVM')}
               </>
             )}
           </ConsistentButton>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -38,6 +39,7 @@ interface ImageRepositoryProps {
 }
 
 export function ImageRepository({ onImageSelect, showSelectButton = false }: ImageRepositoryProps) {
+  const { t } = useTranslation()
   const [images, setImages] = useState<CloudImage[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -85,7 +87,7 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
       const result = await response.json()
       
       toast({
-        title: "Download Started",
+        title: t('images.downloadStarted'),
         description: result.message,
       })
       
@@ -94,8 +96,8 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
       
     } catch (err) {
       toast({
-        title: "Download Failed",
-        description: err instanceof Error ? err.message : "Failed to start download",
+        title: t('images.downloadFailed'),
+        description: err instanceof Error ? err.message : t('images.failedToStartDownload'),
         variant: "destructive",
       })
       setDownloadingImages(prev => {
@@ -128,8 +130,8 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
             fetchImages()
             
             toast({
-              title: "Download Complete",
-              description: `Image ${imageId} downloaded successfully`,
+              title: t('images.downloadComplete'),
+              description: `Image ${imageId} ${t('images.downloadedSuccessfully')}`,
             })
           }
         }
@@ -189,7 +191,7 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
           <div className="text-center text-red-500">
             <p>Error: {error}</p>
             <Button onClick={fetchImages} className="mt-4">
-              Retry
+              {t('images.retry')}
             </Button>
           </div>
         </CardContent>
@@ -200,9 +202,9 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Cloud Image Repository</h2>
+        <h2 className="text-2xl font-bold mb-2">{t('images.cloudImageRepository')}</h2>
         <p className="text-muted-foreground">
-          Download popular cloud images with one click. All images include cloud-init support.
+          {t('images.cloudImageRepositoryDesc')}
         </p>
       </div>
 
@@ -237,16 +239,16 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
                         {image.downloaded ? (
                           <Badge className="bg-green-500 text-white">
                             <CheckCircle className="mr-1 h-3 w-3" />
-                            Downloaded
+                            {t('images.downloaded')}
                           </Badge>
                         ) : isDownloading ? (
                           <Badge variant="secondary">
                             <Clock className="mr-1 h-3 w-3" />
-                            Downloading
+                            {t('images.downloading')}
                           </Badge>
                         ) : (
                           <Badge variant="outline">
-                            Available
+                            {t('images.available')}
                           </Badge>
                         )}
                       </div>
@@ -272,7 +274,7 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
                         <div className="space-y-2">
                           <Progress value={undefined} className="h-2" />
                           <p className="text-xs text-muted-foreground text-center">
-                            Downloading and verifying...
+                            {t('images.downloadingAndVerifying')}
                           </p>
                         </div>
                       )}
@@ -285,7 +287,7 @@ export function ImageRepository({ onImageSelect, showSelectButton = false }: Ima
                             size="sm"
                           >
                             <Download className="mr-2 h-4 w-4" />
-                            Download
+                            {t('images.download')}
                           </Button>
                         )}
                         

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "@/components/i18n-provider"
 
 // Import Xterm.js conditionally to avoid SSR issues
 let Terminal: any = null
@@ -16,6 +17,7 @@ if (typeof window !== 'undefined') {
   // Import CSS
   require("@xterm/xterm/css/xterm.css")
 }
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, Terminal as TerminalIcon, AlertCircle } from "lucide-react"
@@ -25,6 +27,7 @@ interface VMSerialConsoleProps {
 }
 
 export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
+  const { t } = useTranslation()
   const terminalRef = useRef<HTMLDivElement>(null)
   const terminalInstanceRef = useRef<any>(null)
   const fitAddonRef = useRef<any>(null)
@@ -70,7 +73,7 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
         fitAddonRef.current = fitAddon
 
         // Write initial message
-        term.write("🔌 Connecting to serial console...\r\n")
+        term.write(`🔌 ${t('vm.connectingToConsole')}...\r\n`)
 
         // Connect to WebSocket
         await connectToSerialConsole(vmUuid, term)
@@ -123,8 +126,8 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
 
       socket.onopen = () => {
         console.log("Serial console WebSocket connected")
-        term.write("✅ Connected to VM serial console\r\n")
-        term.write("Type 'help' or press Enter for available commands\r\n\r\n")
+        term.write(`✅ ${t('vm.connectedToConsole')}\r\n`)
+        term.write(`${t('vm.consoleHelp')}\r\n\r\n`)
         setIsConnected(true)
         setIsConnecting(false)
       }
@@ -136,11 +139,11 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
 
       socket.onclose = (event) => {
         console.log("Serial console WebSocket closed", event.code, event.reason)
-        term.write(`\r\n🚫 Disconnected from serial console\r\n`)
+        term.write(`\r\n🚫 ${t('vm.disconnectedFromConsole')}\r\n`)
         if (event.code !== 1000) {
-          term.write(`Reason: ${event.reason || 'Connection failed'} (Code: ${event.code})\r\n`)
+          term.write(`${t('vm.disconnectReason')}: ${event.reason || t('vm.connectionFailed')} (${t('vm.code')}: ${event.code})\r\n`)
           if (event.code === 1006) {
-            term.write(`This usually indicates a server connection issue or authentication failure.\r\n`)
+            term.write(`${t('vm.connectionIssueHint')}\r\n`)
           }
         }
         setIsConnected(false)
@@ -149,8 +152,8 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
 
       socket.onerror = (error) => {
         console.error("Serial console WebSocket error:", error)
-        term.write(`\r\n❌ Connection error\r\n`)
-        setError("WebSocket connection failed")
+        term.write(`\r\n❌ ${t('vm.connectionError')}\r\n`)
+        setError(t('vm.websocketFailed'))
         setIsConnecting(false)
       }
 
@@ -163,7 +166,7 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
 
     } catch (err) {
       console.error("Failed to connect to serial console:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to connect"
+      const errorMessage = err instanceof Error ? err.message : t('vm.failedToConnect')
       term.write(`\r\n❌ ${errorMessage}\r\n`)
       setError(errorMessage)
       setIsConnecting(false)
@@ -195,23 +198,23 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <TerminalIcon className="h-5 w-5" />
-          Serial Console
+          {t('vm.serialConsole')}
           {isConnected && (
             <div className="ml-auto flex items-center gap-2">
               <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-muted-foreground">Connected</span>
+              <span className="text-sm text-muted-foreground">{t('vm.connected')}</span>
             </div>
           )}
           {isConnecting && (
             <div className="ml-auto flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm text-muted-foreground">Connecting...</span>
+              <span className="text-sm text-muted-foreground">{t('vm.connecting')}...</span>
             </div>
           )}
           {!isConnected && !isConnecting && (
             <div className="ml-auto flex items-center gap-2">
               <div className="h-2 w-2 bg-red-500 rounded-full" />
-              <span className="text-sm text-muted-foreground">Disconnected</span>
+              <span className="text-sm text-muted-foreground">{t('vm.disconnected')}</span>
             </div>
           )}
         </CardTitle>
@@ -229,7 +232,7 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
                   onClick={handleReconnect}
                   className="ml-auto"
                 >
-                  Reconnect
+                  {t('vm.reconnect')}
                 </Button>
               </div>
             </div>
@@ -245,10 +248,10 @@ export function VMSerialConsole({ vmUuid }: VMSerialConsoleProps) {
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-b-lg">
               <div className="text-center text-white">
                 <TerminalIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">Serial Console Disconnected</p>
-                <p className="text-sm opacity-75 mb-4">Click reconnect to restore the connection</p>
+                <p className="text-lg font-medium mb-2">{t('vm.consoleDisconnected')}</p>
+                <p className="text-sm opacity-75 mb-4">{t('vm.clickReconnect')}</p>
                 <Button onClick={handleReconnect} variant="outline">
-                  Reconnect
+                  {t('vm.reconnect')}
                 </Button>
               </div>
             </div>

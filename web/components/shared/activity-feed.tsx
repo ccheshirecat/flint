@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { useTranslation } from "@/components/i18n-provider"
 
 interface Activity {
   action: string
@@ -13,11 +14,13 @@ interface ActivityFeedProps {
   title?: string
 }
 
-export function ActivityFeed({ activities, title = "Recent Activity" }: ActivityFeedProps) {
+export function ActivityFeed({ activities, title }: ActivityFeedProps) {
+  const { t } = useTranslation()
+  const displayTitle = title || t('vm.recentActivity')
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
+        <CardTitle className="text-base">{displayTitle}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {activities.map((activity, index) => (
