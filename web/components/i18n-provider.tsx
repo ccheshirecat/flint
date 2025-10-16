@@ -18,8 +18,26 @@ export function I18nProvider({
   children: React.ReactNode
   initialLocale?: Locale 
 }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale)
-  const [translations, setTranslations] = useState(getTranslations(defaultLocale))
+  const [locale, setLocale] = useState<Locale>(() => {
+    // Try to get saved locale immediately during initialization
+    if (typeof window !== 'undefined') {
+      const savedLocale = localStorage.getItem('locale') as Locale
+      if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh')) {
+        return savedLocale
+      }
+    }
+    return defaultLocale
+  })
+  const [translations, setTranslations] = useState(() => {
+    // Initialize translations based on the determined locale
+    if (typeof window !== 'undefined') {
+      const savedLocale = localStorage.getItem('locale') as Locale
+      if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh')) {
+        return getTranslations(savedLocale)
+      }
+    }
+    return getTranslations(defaultLocale)
+  })
   const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
@@ -32,23 +50,18 @@ export function I18nProvider({
   }, [locale])
 
   useEffect(() => {
-    // Load locale preference from localStorage only once
+    // Ensure localStorage is updated on first load if no preference was saved
     if (typeof window !== 'undefined' && !isInitialized) {
-      const savedLocale = localStorage.getItem('locale') as Locale
-      if (savedLocale && (savedLocale === 'en' || savedLocale === 'zh')) {
-        console.log('Loading saved locale:', savedLocale)
-        setLocale(savedLocale)
-        setTranslations(getTranslations(savedLocale))
+      const savedLocale = localStorage.getItem('locale')
+      if (!savedLocale) {
+        console.log('No saved locale found, setting to current locale:', locale)
+        localStorage.setItem('locale', locale)
       } else {
-        // Set default locale if no saved preference
-        console.log('Setting default locale to', defaultLocale)
-        setLocale(defaultLocale)
-        setTranslations(getTranslations(defaultLocale))
-        localStorage.setItem('locale', defaultLocale)
+        console.log('Loaded saved locale:', savedLocale)
       }
       setIsInitialized(true)
     }
-  }, [isInitialized])
+  }, [isInitialized, locale])
 
   const t = (key: string): string => {
     const keys = key.split('.')
